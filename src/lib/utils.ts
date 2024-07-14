@@ -6,5 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const normalizePath = (path: string) => {
-  return path.startsWith("/") ? path : "/${path}";
+  return path.startsWith("/") ? path.slice(1) : path;
 };
