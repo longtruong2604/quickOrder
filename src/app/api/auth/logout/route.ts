@@ -1,41 +1,36 @@
-import authApiRequest from "@/apiRequest/auth";
-import { LoginBodyType } from "@/schemaValidations/auth.schema";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
-import { HttpError } from "@/lib/http";
+import authApiRequest from "@/apiRequest/auth";
 
-const POST = async (request: Request) => {
-  const res = (await request.json()) as LoginBodyType;
+export async function POST(request: Request) {
   const cookieStore = cookies();
-  try {
-    const { payload } = await authApiRequest.serverLogin(res);
-    const {
-      data: { accessToken, refreshToken },
-    } = payload;
-    const decodedAccessToken = jwt.decode(accessToken) as { exp: number };
-    const decodedRefreshToken = jwt.decode(refreshToken) as { exp: number };
-    cookieStore.set("accessToken", accessToken, {
-      expires: decodedAccessToken.exp * 1000,
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
-      secure: true,
-    });
-    cookieStore.set("refreshToken", refreshToken, {
-      expires: decodedRefreshToken.exp * 1000,
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
-      secure: true,
-    });
-    return Response.json(payload);
-  } catch (error) {
-    if (error instanceof HttpError) {
-      return Response.json(error.payload, { status: error.status });
-    } else
-      return Response.json(
-        { message: "Internal Server Error" },
-        { status: 500 }
-      );
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const refreshToken = cookieStore.get("refreshToken")?.value;
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
+  if (!accessToken || !refreshToken) {
+    return Response.json(
+      {
+        message: "Can not find token",
+      },
+      {
+        status: 200,
+      }
+    );
   }
-};
+  try {
+    const result = await authApiRequest.serverLogout({
+      refreshToken,
+      accessToken,
+    });
+    return Response.json(result.payload);
+  } catch (error) {
+    return Response.json(
+      {
+        message: "Something went wrong",
+      },
+      {
+        status: 200,
+      }
+    );
+  }
+}

@@ -4,6 +4,8 @@ import { LoginResType } from "@/schemaValidations/auth.schema";
 import envConfig from "../../config";
 
 type CustomOptions = Omit<RequestInit, "method"> & {
+  // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.NEXT_PUBLIC_API_ENDPOINT:http://localhost:4000
+  // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server:http://localhost:3000
   baseUrl?: string | undefined;
 };
 
@@ -103,7 +105,6 @@ const request = async <Response>(
       : options.baseUrl;
 
   const fullUrl = `${baseUrl}/${normalizePath(url)}`;
-  console.log(fullUrl);
   const res = await fetch(fullUrl, {
     ...options,
     headers: {
@@ -120,7 +121,7 @@ const request = async <Response>(
     payload,
   };
 
-  // Interceptor là nời chúng ta xử lý request và response trước khi trả về cho phía component
+  // Interceptor là nơi chúng ta xử lý request và response trước khi trả về cho phía component
   if (!res.ok) {
     if (res.status === ENTITY_ERROR_STATUS) {
       throw new EntityError(
