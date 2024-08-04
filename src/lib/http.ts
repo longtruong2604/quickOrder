@@ -164,7 +164,7 @@ const request = async <Response>(
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isClient) {
     const normalizeUrl = normalizePath(url);
-    if (normalizeUrl === "auth/login") {
+    if (normalizeUrl === "api/auth/login") {
       localStorage.setItem(
         "accessToken",
         (payload as LoginResType).data.accessToken
@@ -173,7 +173,7 @@ const request = async <Response>(
         "refreshToken",
         (payload as LoginResType).data.refreshToken
       );
-    } else if (normalizeUrl === "auth/logout") {
+    } else if (normalizeUrl === "api/auth/logout") {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
     }

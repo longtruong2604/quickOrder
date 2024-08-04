@@ -21,6 +21,7 @@ const authApiRequest = {
         },
       }
     ), // baseUrl: "localhost:4000"
-  logout: () => http.post<MessageResType>("api/auth/logout", { baseUrl: "" }), // baseUrl: "localhost:3000"
+  logout: () =>
+    http.post<MessageResType>("api/auth/logout", null, { baseUrl: "" }), // baseUrl: "localhost:3000"
 };
 export default authApiRequest;
