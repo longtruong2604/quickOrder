@@ -12,17 +12,19 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useMemo, useRef, useState } from "react";
-import { useAccountQuery } from "@/queries/use-account";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useAccountMeQuery, useUpdateMeMutation } from "@/queries/use-account";
+import { useUploadMedia } from "@/queries/use-media";
+import { useToast } from "@/components/ui/use-toast";
+import { handleErrorApi } from "@/lib/utils";
 
 export default function UpdateProfileForm() {
+  const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
-
-  useAccountQuery((data) => {});
-  const { avatar, name } = data?.payload?.data || {};
-
+  const { data, refetch } = useAccountMeQuery();
+  const uploadMediaMutation = useUploadMedia();
+  const updateMeMutation = useUpdateMeMutation();
   const inputRef = useRef<HTMLInputElement>(null);
-  console.log(avatar, name);
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
@@ -32,6 +34,46 @@ export default function UpdateProfileForm() {
   });
   const formAvatar = form.watch("avatar");
   const formName = form.watch("name");
+
+  const onSubmit = async (data: UpdateMeBodyType) => {
+    if (updateMeMutation.isPending) return; // prevent double submit
+    try {
+      let body = data;
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadRes = await uploadMediaMutation.mutateAsync(formData);
+        const imageUrl = uploadRes.payload.data;
+        body = { ...data, avatar: imageUrl };
+      }
+      const res = await updateMeMutation.mutateAsync(body);
+      toast({
+        description: res.payload.message,
+      });
+      refetch();
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+    }
+  };
+  const reset = () => {
+    setFile(null);
+    form.reset();
+  };
+
+  useEffect(() => {
+    if (data) {
+      const { name, avatar } = data.payload.data;
+      console.log(avatar);
+      form.reset({ name, avatar: avatar ?? "" });
+      // form.setValue("name", name);
+      // form.setValue("avatar", avatar ?? "");
+    }
+  }, [data, form]);
+
+  // const previewAvatar = files ? URL.createObjectURL(file) : avatar; // for NEXTJS 15
   const previewAvatar = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file);
@@ -42,6 +84,10 @@ export default function UpdateProfileForm() {
     <Form {...form}>
       <form
         noValidate
+        onSubmit={form.handleSubmit(onSubmit, (e) =>
+          console.log(e, formAvatar)
+        )}
+        onReset={reset}
         className="grid auto-rows-max items-start gap-4 md:gap-8"
       >
         <Card x-chunk="dashboard-07-chunk-0">

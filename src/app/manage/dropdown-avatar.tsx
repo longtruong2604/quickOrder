@@ -14,13 +14,13 @@ import { useLogoutMutation } from "@/queries/use-auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { handleErrorApi } from "@/lib/utils";
-import { useAccountQuery } from "@/queries/use-account";
+import { useAccountMeQuery } from "@/queries/use-account";
 
 export default function DropdownAvatar() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const { data } = useAccountQuery();
+  const { data } = useAccountMeQuery();
   const account = data?.payload.data;
   const logoutMutation = useLogoutMutation();
 
