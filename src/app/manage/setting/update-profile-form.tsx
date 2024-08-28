@@ -29,7 +29,7 @@ export default function UpdateProfileForm() {
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
       name: "",
-      avatar: "",
+      // avatar: "",
     },
   });
   const formAvatar = form.watch("avatar");
@@ -67,15 +67,15 @@ export default function UpdateProfileForm() {
     if (data) {
       const { name, avatar } = data.payload.data;
       console.log(avatar);
-      form.reset({ name, avatar: avatar ?? "" });
-      // form.setValue("name", name);
-      // form.setValue("avatar", avatar ?? "");
+      form.setValue("name", name);
+      if (avatar) form.setValue("avatar", avatar);
     }
   }, [data, form]);
 
   // const previewAvatar = files ? URL.createObjectURL(file) : avatar; // for NEXTJS 15
   const previewAvatar = useMemo(() => {
     if (file) {
+      console.log(file);
       return URL.createObjectURL(file);
     } else return formAvatar;
   }, [file, formAvatar]);
@@ -103,7 +103,10 @@ export default function UpdateProfileForm() {
                   <FormItem>
                     <div className="flex gap-2 items-start justify-start">
                       <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
-                        <AvatarImage src={previewAvatar} />
+                        <AvatarImage
+                          src={previewAvatar}
+                          className="object-cover "
+                        />
                         <AvatarFallback className="rounded-none">
                           {formName}
                         </AvatarFallback>
