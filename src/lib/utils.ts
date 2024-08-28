@@ -36,3 +36,7 @@ export const handleErrorApi = ({
     });
   }
 };
+
+export const getRefreshTokenFromStorage = () => {
+  return localStorage.getItem("refreshToken");
+};
