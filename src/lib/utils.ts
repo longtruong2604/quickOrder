@@ -40,3 +40,7 @@ export const handleErrorApi = ({
 export const getRefreshTokenFromStorage = () => {
   return localStorage.getItem("refreshToken");
 };
+
+export const getAccessTokenFromStorage = () => {
+  return localStorage.getItem("accessToken");
+};
