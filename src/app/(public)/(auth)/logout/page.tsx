@@ -1,5 +1,8 @@
 "use client";
-import { getRefreshTokenFromStorage } from "@/lib/utils";
+import {
+  getAccessTokenFromStorage,
+  getRefreshTokenFromStorage,
+} from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/use-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -9,11 +12,17 @@ const LogoutPage = () => {
   const { mutateAsync } = useLogoutMutation();
   const ref = useRef<any>(null);
   const searchParams = useSearchParams();
-  const token = searchParams.get("refreshToken");
+  const refreshToken = searchParams.get("refreshToken");
+  const accessToken = searchParams.get("accessToken");
 
   // prevent double api request
   useEffect(() => {
-    if (ref.current || token !== getRefreshTokenFromStorage()) return;
+    if (
+      ref.current ||
+      refreshToken !== getRefreshTokenFromStorage() ||
+      accessToken !== getAccessTokenFromStorage()
+    )
+      return;
     ref.current = true;
     mutateAsync().then(() => {
       setTimeout(() => {
