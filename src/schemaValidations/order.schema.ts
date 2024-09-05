@@ -11,7 +11,7 @@ const DishSnapshotSchema = z.object({
   status: z.enum(DishStatusValues),
   dishId: z.number().nullable(),
   createdAt: z.date(),
-  updatedAt: z.date()
+  updatedAt: z.date(),
 })
 export const OrderSchema = z.object({
   id: z.number(),
@@ -20,7 +20,7 @@ export const OrderSchema = z.object({
     .object({
       id: z.number(),
       name: z.string(),
-      tableNumber: z.number().nullable()
+      tableNumber: z.number().nullable(),
     })
     .nullable(),
   tableNumber: z.number().nullable(),
@@ -29,33 +29,33 @@ export const OrderSchema = z.object({
   quantity: z.number(),
   orderHandlerId: z.number().nullable(),
   orderHandler: AccountSchema.nullable(),
-  status: z.enum(OrderStatusValues)
+  status: z.enum(OrderStatusValues),
 })
 
 export const UpdateOrderBody = z.object({
   status: z.enum(OrderStatusValues),
   dishId: z.number(),
-  quantity: z.number()
+  quantity: z.number(),
 })
 
 export type UpdateOrderBodyType = z.TypeOf<typeof UpdateOrderBody>
 
 export const OrderParam = z.object({
-  orderId: z.coerce.number()
+  orderId: z.coerce.number(),
 })
 
 export type OrderParamType = z.TypeOf<typeof OrderParam>
 
 export const UpdateOrderRes = z.object({
   message: z.string(),
-  data: OrderSchema
+  data: OrderSchema,
 })
 
 export type UpdateOrderResType = z.TypeOf<typeof UpdateOrderRes>
 
 export const GetOrdersRes = z.object({
   message: z.string(),
-  data: z.array(OrderSchema)
+  data: z.array(OrderSchema),
 })
 
 export type GetOrdersResType = z.TypeOf<typeof GetOrdersRes>

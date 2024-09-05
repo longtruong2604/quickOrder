@@ -1,14 +1,14 @@
-import Link from "next/link";
-import { Menu, Package2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { DarkModeToggle } from "@/components/dark-mode-toggle";
-import NavItems from "@/app/(public)/nav-items";
+import Link from 'next/link'
+import { Menu, Package2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { DarkModeToggle } from '@/components/dark-mode-toggle'
+import NavItems from '@/app/(public)/nav-items'
 
 export default function Layout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <div className="flex min-h-screen w-full flex-col relative">
@@ -56,5 +56,5 @@ export default function Layout({
         {children}
       </main>
     </div>
-  );
+  )
 }

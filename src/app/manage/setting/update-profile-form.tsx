@@ -1,84 +1,84 @@
-"use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Upload } from "lucide-react";
-import { useForm } from "react-hook-form";
+'use client'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Upload } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 import {
   UpdateMeBody,
   UpdateMeBodyType,
-} from "@/schemaValidations/account.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useAccountMeQuery, useUpdateMeMutation } from "@/queries/use-account";
-import { useUploadMedia } from "@/queries/use-media";
-import { useToast } from "@/components/ui/use-toast";
-import { handleErrorApi } from "@/lib/utils";
+} from '@/schemaValidations/account.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useAccountMeQuery, useUpdateMeMutation } from '@/queries/use-account'
+import { useUploadMedia } from '@/queries/use-media'
+import { useToast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function UpdateProfileForm() {
-  const { toast } = useToast();
-  const [file, setFile] = useState<File | null>(null);
-  const { data, refetch } = useAccountMeQuery();
-  const uploadMediaMutation = useUploadMedia();
-  const updateMeMutation = useUpdateMeMutation();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast()
+  const [file, setFile] = useState<File | null>(null)
+  const { data, refetch } = useAccountMeQuery()
+  const uploadMediaMutation = useUploadMedia()
+  const updateMeMutation = useUpdateMeMutation()
+  const inputRef = useRef<HTMLInputElement>(null)
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
-      name: "",
+      name: '',
       // avatar: "",
     },
-  });
-  const formAvatar = form.watch("avatar");
-  const formName = form.watch("name");
+  })
+  const formAvatar = form.watch('avatar')
+  const formName = form.watch('name')
 
   const onSubmit = async (data: UpdateMeBodyType) => {
-    if (updateMeMutation.isPending) return; // prevent double submit
+    if (updateMeMutation.isPending) return // prevent double submit
     try {
-      let body = data;
+      let body = data
       if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const uploadRes = await uploadMediaMutation.mutateAsync(formData);
-        const imageUrl = uploadRes.payload.data;
-        body = { ...data, avatar: imageUrl };
+        const formData = new FormData()
+        formData.append('file', file)
+        const uploadRes = await uploadMediaMutation.mutateAsync(formData)
+        const imageUrl = uploadRes.payload.data
+        body = { ...data, avatar: imageUrl }
       }
-      const res = await updateMeMutation.mutateAsync(body);
+      const res = await updateMeMutation.mutateAsync(body)
       toast({
         description: res.payload.message,
-      });
-      refetch();
+      })
+      refetch()
     } catch (error) {
       handleErrorApi({
         error,
         setError: form.setError,
-      });
+      })
     }
-  };
+  }
   const reset = () => {
-    setFile(null);
-    form.reset();
-  };
+    setFile(null)
+    form.reset()
+  }
 
   useEffect(() => {
     if (data) {
-      const { name, avatar } = data.payload.data;
-      console.log(avatar);
-      form.setValue("name", name);
-      if (avatar) form.setValue("avatar", avatar);
+      const { name, avatar } = data.payload.data
+      console.log(avatar)
+      form.setValue('name', name)
+      if (avatar) form.setValue('avatar', avatar)
     }
-  }, [data, form]);
+  }, [data, form])
 
   // const previewAvatar = files ? URL.createObjectURL(file) : avatar; // for NEXTJS 15
   const previewAvatar = useMemo(() => {
     if (file) {
-      console.log(file);
-      return URL.createObjectURL(file);
-    } else return formAvatar;
-  }, [file, formAvatar]);
+      console.log(file)
+      return URL.createObjectURL(file)
+    } else return formAvatar
+  }, [file, formAvatar])
 
   return (
     <Form {...form}>
@@ -99,6 +99,7 @@ export default function UpdateProfileForm() {
               <FormField
                 control={form.control}
                 name="avatar"
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex gap-2 items-start justify-start">
@@ -117,9 +118,9 @@ export default function UpdateProfileForm() {
                         className="hidden"
                         ref={inputRef}
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
+                          const file = e.target.files?.[0]
                           if (file) {
-                            setFile(file);
+                            setFile(file)
                           }
                         }}
                       />
@@ -168,5 +169,5 @@ export default function UpdateProfileForm() {
         </Card>
       </form>
     </Form>
-  );
+  )
 }
