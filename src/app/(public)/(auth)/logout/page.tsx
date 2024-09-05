@@ -5,9 +5,9 @@ import {
 } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/use-auth'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, Suspense } from 'react'
 
-const LogoutPage = () => {
+const LogoutComponent = () => {
   const router = useRouter()
   const { mutateAsync } = useLogoutMutation()
   const ref = useRef<any>(null)
@@ -31,6 +31,16 @@ const LogoutPage = () => {
       router.push('/login')
     })
   }, [accessToken, mutateAsync, refreshToken, router])
+
   return <div>Logout...</div>
 }
+
+const LogoutPage = () => {
+  return (
+    <Suspense fallback={<div>Loading logout...</div>}>
+      <LogoutComponent />
+    </Suspense>
+  )
+}
+
 export default LogoutPage
