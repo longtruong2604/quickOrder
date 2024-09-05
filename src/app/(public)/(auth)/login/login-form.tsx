@@ -1,42 +1,42 @@
-"use client";
-import { Button } from "@/components/ui/button";
+'use client'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
-import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMutation } from "@/queries/use-auth";
-import { useToast } from "@/components/ui/use-toast";
-import { handleErrorApi } from "@/lib/utils";
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useForm } from 'react-hook-form'
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useLoginMutation } from '@/queries/use-auth'
+import { useToast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function LoginForm() {
-  const { toast } = useToast();
-  const loginMutation = useLoginMutation();
+  const { toast } = useToast()
+  const loginMutation = useLoginMutation()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-  });
+  })
 
   const onSubmit = async (data: LoginBodyType) => {
-    if (loginMutation.isPending) return;
+    if (loginMutation.isPending) return
     try {
-      const result = await loginMutation.mutateAsync(data);
-      toast({ title: result.payload.message });
+      const result = await loginMutation.mutateAsync(data)
+      toast({ title: result.payload.message })
     } catch (error) {
-      handleErrorApi({ error, setError: form.setError });
+      handleErrorApi({ error, setError: form.setError })
     }
-  };
+  }
 
   return (
     <Card className="mx-auto max-w-sm">
@@ -104,5 +104,5 @@ export default function LoginForm() {
         </Form>
       </CardContent>
     </Card>
-  );
+  )
 }

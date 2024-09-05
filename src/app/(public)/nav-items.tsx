@@ -5,22 +5,22 @@ import Link from 'next/link'
 const menuItems = [
   {
     title: 'Món ăn',
-    href: '/menu'
+    href: '/menu',
   },
   {
     title: 'Đơn hàng',
-    href: '/orders'
+    href: '/orders',
   },
   {
     title: 'Đăng nhập',
     href: '/login',
-    authRequired: false
+    authRequired: false,
   },
   {
     title: 'Quản lý',
     href: '/manage/dashboard',
-    authRequired: true
-  }
+    authRequired: true,
+  },
 ]
 
 export default function NavItems({ className }: { className?: string }) {

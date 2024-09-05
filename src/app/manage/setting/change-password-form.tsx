@@ -1,60 +1,60 @@
-"use client";
+'use client'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-import { useForm } from "react-hook-form";
+import { useForm } from 'react-hook-form'
 import {
   ChangePasswordBody,
   ChangePasswordBodyType,
-} from "@/schemaValidations/account.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { useChangePasswordMutation } from "@/queries/use-account";
-import { useToast } from "@/components/ui/use-toast";
-import { handleErrorApi } from "@/lib/utils";
+} from '@/schemaValidations/account.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { useChangePasswordMutation } from '@/queries/use-account'
+import { useToast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function ChangePasswordForm() {
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
-      oldPassword: "",
-      password: "",
-      confirmPassword: "",
+      oldPassword: '',
+      password: '',
+      confirmPassword: '',
     },
-  });
+  })
 
-  const changePasswordMutation = useChangePasswordMutation();
-  const { toast } = useToast();
+  const changePasswordMutation = useChangePasswordMutation()
+  const { toast } = useToast()
   const onSubmit = async (data: ChangePasswordBodyType) => {
-    if (changePasswordMutation.isPending) return; // prevent double submit
+    if (changePasswordMutation.isPending) return // prevent double submit
     try {
-      const res = await changePasswordMutation.mutateAsync(data);
+      const res = await changePasswordMutation.mutateAsync(data)
       toast({
         description: res.payload.message,
-      });
-      form.reset();
+      })
+      form.reset()
     } catch (error) {
       handleErrorApi({
         error,
         setError: form.setError,
-      });
+      })
     }
-  };
+  }
 
   return (
     <Form {...form}>
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit, (e) => {
-          console.log(e);
+          console.log(e)
         })}
         className="grid auto-rows-max items-start gap-4 md:gap-8"
       >
@@ -134,5 +134,5 @@ export default function ChangePasswordForm() {
         </Card>
       </form>
     </Form>
-  );
+  )
 }
