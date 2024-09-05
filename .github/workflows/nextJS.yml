@@ -1,0 +1,64 @@
+name: Next.js CI
+
+# Trigger the workflow on push or pull request to the main branch
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+# Define the jobs to run in this workflow
+jobs:
+  install-build-lint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]  # You can adjust the node versions as necessary
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Step 3: Cache Yarn dependencies to speed up subsequent builds
+      - name: Cache Yarn dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            **/yarn.lock
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      # Step 4: Install dependencies using Yarn
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Step 5: Run ESLint to check code style (uses `next lint` based on your scripts)
+      - name: Run ESLint
+        run: yarn lint
+
+      # Step 6: Format code using Prettier (uses your `format` script)
+      - name: Format code
+        run: yarn format
+
+      # Step 7: Build the Next.js project (uses `next build` from your scripts)
+      - name: Build project
+        run: yarn build
+
+      # Optional: Upload the build artifact (useful for deployment)
+      - name: Upload production build
+        uses: actions/upload-artifact@v3
+        with:
+          name: nextjs-build
+          path: .next
