@@ -9,6 +9,11 @@ import {
 import { MessageResType } from '@/schemaValidations/common.schema'
 
 const authApiRequest = {
+  //To prevent duplicate API request
+  refreshTokenRequest: null as Promise<{
+    status: number
+    payload: RefreshTokenResType
+  }> | null,
   login: (body: LoginBodyType) =>
     http.post<LoginResType>('api/auth/login', body, { baseUrl: '' }), // baseUrl: "localhost:3000"
   serverLogin: (body: LoginBodyType) =>
@@ -25,9 +30,27 @@ const authApiRequest = {
         },
       }
     ), // baseUrl: "localhost:4000"
-  refreshToken: () =>
-    http.post('api/auth/refresh-token', null, { baseUrl: '' }), // baseUrl: "localhost:3000"
+
   serverRefreshToken: (body: RefreshTokenBodyType) =>
     http.post<RefreshTokenResType>('auth/refresh-token', body),
+
+  //To prevent duplicate API request
+  // This is a normal method, so the this keyword will refer to the object that calls the method.
+  // Arrow functions do not have their own this keyword. They will inherit the this value from the enclosing scope.
+  async refreshToken() {
+    if (this.refreshTokenRequest) {
+      return this.refreshTokenRequest
+    }
+    this.refreshTokenRequest = http.post<RefreshTokenResType>(
+      '/api/auth/refresh-token',
+      null,
+      {
+        baseUrl: '',
+      }
+    )
+    const result = await this.refreshTokenRequest
+    this.refreshTokenRequest = null
+    return result
+  },
 }
 export default authApiRequest
