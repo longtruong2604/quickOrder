@@ -1,6 +1,17 @@
 {
   "extends": [
     "next/core-web-vitals",
-    "plugin:@tanstack/eslint-plugin-query/recommended"
-  ]
+    "plugin:@tanstack/eslint-plugin-query/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended" // Add this line
+  ],
+  "plugins": ["@typescript-eslint", "prettier"], // Add Prettier here
+  "rules": {
+    "prettier/prettier": "error", // Report Prettier issues as ESLint errors
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }
+    ]
+  }
 }
