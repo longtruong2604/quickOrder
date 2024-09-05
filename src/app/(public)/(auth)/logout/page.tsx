@@ -12,8 +12,8 @@ const LogoutPage = () => {
   const { mutateAsync } = useLogoutMutation()
   const ref = useRef<any>(null)
   const searchParams = useSearchParams()
-  const refreshToken = searchParams.get('refreshToken')
-  const accessToken = searchParams.get('accessToken')
+  const refreshToken = searchParams.get('refresh_token')
+  const accessToken = searchParams.get('access_token')
 
   // prevent double api request
   useEffect(() => {
