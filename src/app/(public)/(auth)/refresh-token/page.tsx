@@ -4,14 +4,14 @@ import {
   getRefreshTokenFromLocalStorage,
 } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 
-const LogoutPage = () => {
+const RefreshTokenComponent = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const refreshToken = searchParams.get('refresh_token')
   const redirectUrl = searchParams.get('redirect')
-  // prevent double api request
+
   useEffect(() => {
     if (refreshToken && refreshToken === getRefreshTokenFromLocalStorage()) {
       checkAndRefreshToken({
@@ -19,7 +19,17 @@ const LogoutPage = () => {
           redirectUrl ? router.push(redirectUrl) : router.push('/login'),
       })
     }
-  }, [])
+  }, [refreshToken, redirectUrl, router])
+
   return <div>Refreshing...</div>
 }
-export default LogoutPage
+
+const RefreshTokenPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RefreshTokenComponent />
+    </Suspense>
+  )
+}
+
+export default RefreshTokenPage
