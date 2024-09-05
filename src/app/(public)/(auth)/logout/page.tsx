@@ -1,7 +1,7 @@
 'use client'
 import {
-  getAccessTokenFromStorage,
-  getRefreshTokenFromStorage,
+  getAccessTokenFromLocalStorage,
+  getRefreshTokenFromLocalStorage,
 } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/use-auth'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -19,8 +19,8 @@ const LogoutPage = () => {
   useEffect(() => {
     if (
       ref.current ||
-      (refreshToken && refreshToken !== getRefreshTokenFromStorage()) ||
-      (accessToken && accessToken !== getAccessTokenFromStorage())
+      (refreshToken && refreshToken !== getRefreshTokenFromLocalStorage()) ||
+      (accessToken && accessToken !== getAccessTokenFromLocalStorage())
     )
       return
     ref.current = true
