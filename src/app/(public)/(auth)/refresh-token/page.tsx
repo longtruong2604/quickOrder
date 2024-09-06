@@ -18,6 +18,8 @@ const RefreshTokenComponent = () => {
         onSuccess: () =>
           redirectUrl ? router.push(redirectUrl) : router.push('/login'),
       })
+    } else {
+      router.push('/login')
     }
   }, [refreshToken, redirectUrl, router])
 
