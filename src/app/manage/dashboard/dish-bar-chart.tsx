@@ -2,20 +2,8 @@
 
 import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 // const colors = [
 //   'var(--color-chrome)',
@@ -88,12 +76,7 @@ export function DishBarChart() {
             />
             <XAxis dataKey="successOrders" type="number" hide />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar
-              dataKey="successOrders"
-              name={'Đơn thanh toán'}
-              layout="vertical"
-              radius={5}
-            />
+            <Bar dataKey="successOrders" name={'Đơn thanh toán'} layout="vertical" radius={5} />
           </BarChart>
         </ChartContainer>
       </CardContent>

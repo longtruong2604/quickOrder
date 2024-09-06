@@ -1,19 +1,8 @@
 'use client'
 
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { format, parse } from 'date-fns'
 const chartConfig = {
   desktop: {
@@ -99,17 +88,8 @@ export function RevenueLineChart() {
                 return ''
               }}
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="dashed" />}
-            />
-            <Line
-              dataKey="revenue"
-              type="linear"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
-            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+            <Line dataKey="revenue" type="linear" stroke="var(--color-desktop)" strokeWidth={2} dot={false} />
           </LineChart>
         </ChartContainer>
       </CardContent>

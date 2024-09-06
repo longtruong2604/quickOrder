@@ -5,10 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Upload } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import {
-  UpdateMeBody,
-  UpdateMeBodyType,
-} from '@/schemaValidations/account.schema'
+import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -84,9 +81,7 @@ export default function UpdateProfileForm() {
     <Form {...form}>
       <form
         noValidate
-        onSubmit={form.handleSubmit(onSubmit, (e) =>
-          console.log(e, formAvatar)
-        )}
+        onSubmit={form.handleSubmit(onSubmit, (e) => console.log(e, formAvatar))}
         onReset={reset}
         className="grid auto-rows-max items-start gap-4 md:gap-8"
       >
@@ -104,13 +99,8 @@ export default function UpdateProfileForm() {
                   <FormItem>
                     <div className="flex gap-2 items-start justify-start">
                       <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
-                        <AvatarImage
-                          src={previewAvatar}
-                          className="object-cover "
-                        />
-                        <AvatarFallback className="rounded-none">
-                          {formName}
-                        </AvatarFallback>
+                        <AvatarImage src={previewAvatar} className="object-cover " />
+                        <AvatarFallback className="rounded-none">{formName}</AvatarFallback>
                       </Avatar>
                       <input
                         type="file"
@@ -144,12 +134,7 @@ export default function UpdateProfileForm() {
                   <FormItem>
                     <div className="grid gap-3">
                       <Label htmlFor="name">Tên</Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        className="w-full"
-                        {...field}
-                      />
+                      <Input id="name" type="text" className="w-full" {...field} />
                       <FormMessage />
                     </div>
                   </FormItem>

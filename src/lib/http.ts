@@ -25,15 +25,7 @@ export class HttpError extends Error {
     message: string
     [key: string]: any
   }
-  constructor({
-    status,
-    payload,
-    message = 'Http Error',
-  }: {
-    status: number
-    payload: any
-    message?: string
-  }) {
+  constructor({ status, payload, message = 'Http Error' }: { status: number; payload: any; message?: string }) {
     super(message)
     this.status = status
     this.payload = payload
@@ -42,13 +34,7 @@ export class HttpError extends Error {
 export class EntityError extends HttpError {
   status: typeof ENTITY_ERROR_STATUS
   payload: EntityErrorPayload
-  constructor({
-    status,
-    payload,
-  }: {
-    status: typeof ENTITY_ERROR_STATUS
-    payload: EntityErrorPayload
-  }) {
+  constructor({ status, payload }: { status: typeof ENTITY_ERROR_STATUS; payload: EntityErrorPayload }) {
     super({ status, payload, message: 'Entity Error' })
     this.status = status
     this.payload = payload
@@ -89,8 +75,7 @@ const request = async <Response>(
   if (options?.body instanceof FormData) body = options.body
   else if (options?.body) body = JSON.stringify(options.body)
 
-  const baseHeaders: { [key: string]: string } =
-    body instanceof FormData ? {} : { 'Content-Type': 'application/json' }
+  const baseHeaders: { [key: string]: string } = body instanceof FormData ? {} : { 'Content-Type': 'application/json' }
 
   if (isClient) {
     const accessToken = localStorage.getItem('accessToken')
@@ -99,10 +84,7 @@ const request = async <Response>(
 
   // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.NEXT_PUBLIC_API_ENDPOINT:http://localhost:4000
   // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server:http://localhost:3000
-  const baseUrl =
-    options?.baseUrl === undefined
-      ? envConfig.NEXT_PUBLIC_API_ENDPOINT
-      : options.baseUrl
+  const baseUrl = options?.baseUrl === undefined ? envConfig.NEXT_PUBLIC_API_ENDPOINT : options.baseUrl
 
   const fullUrl = `${baseUrl}/${normalizePath(url)}`
   const res = await fetch(fullUrl, {
@@ -152,9 +134,7 @@ const request = async <Response>(
           }
         }
       } else {
-        const accessToken = (options?.headers as any)?.Authorization.split(
-          'Bearer '
-        )[1]
+        const accessToken = (options?.headers as any)?.Authorization.split('Bearer ')[1]
         redirect(`/logout?accessToken=${accessToken}`)
       }
     } else {
@@ -165,14 +145,8 @@ const request = async <Response>(
   if (isClient) {
     const normalizeUrl = normalizePath(url)
     if (normalizeUrl === 'api/auth/login') {
-      localStorage.setItem(
-        'accessToken',
-        (payload as LoginResType).data.accessToken
-      )
-      localStorage.setItem(
-        'refreshToken',
-        (payload as LoginResType).data.refreshToken
-      )
+      localStorage.setItem('accessToken', (payload as LoginResType).data.accessToken)
+      localStorage.setItem('refreshToken', (payload as LoginResType).data.refreshToken)
     } else if (normalizeUrl === 'api/auth/logout') {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
@@ -181,24 +155,13 @@ const request = async <Response>(
   return data
 }
 const http = {
-  get<Response>(
-    url: string,
-    options?: Omit<CustomOptions, 'body'> | undefined
-  ) {
+  get<Response>(url: string, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('GET', url, options)
   },
-  post<Response>(
-    url: string,
-    body: any,
-    options?: Omit<CustomOptions, 'body'> | undefined
-  ) {
+  post<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('POST', url, { ...options, body })
   },
-  put<Response>(
-    url: string,
-    body: any,
-    options?: Omit<CustomOptions, 'body'> | undefined
-  ) {
+  put<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('PUT', url, { ...options, body })
   },
   delete<Response>(url: string, options?: CustomOptions | undefined) {

@@ -21,11 +21,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
   // Is authenticated but access token is expired
-  if (
-    privatePaths.some((path) => pathname.startsWith(path)) &&
-    !accessToken &&
-    refreshToken
-  ) {
+  if (privatePaths.some((path) => pathname.startsWith(path)) && !accessToken && refreshToken) {
     const url = new URL('/refresh-token', request.url)
     // can only logout if refresh token is valid
     url.searchParams.set('refresh_token', refreshToken)

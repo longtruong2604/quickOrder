@@ -1,8 +1,5 @@
 'use client'
-import {
-  checkAndRefreshToken,
-  getRefreshTokenFromLocalStorage,
-} from '@/lib/utils'
+import { checkAndRefreshToken, getRefreshTokenFromLocalStorage } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, Suspense } from 'react'
 
@@ -15,8 +12,7 @@ const RefreshTokenComponent = () => {
   useEffect(() => {
     if (refreshToken && refreshToken === getRefreshTokenFromLocalStorage()) {
       checkAndRefreshToken({
-        onSuccess: () =>
-          redirectUrl ? router.push(redirectUrl) : router.push('/login'),
+        onSuccess: () => (redirectUrl ? router.push(redirectUrl) : router.push('/login')),
       })
     } else {
       router.push('/login')
