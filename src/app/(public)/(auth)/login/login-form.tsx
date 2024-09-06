@@ -16,9 +16,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '@/queries/use-auth'
 import { useToast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
+import { useSearchParams } from 'next/navigation'
+import { useEffect } from 'react'
+import { useAppContext } from '@/components/app-provider'
 
 export default function LoginForm() {
   const { toast } = useToast()
+  const { setIsAuth } = useAppContext()
+  const searchParams = useSearchParams()
+  const clearTokens = searchParams.get('clear_tokens')
   const loginMutation = useLoginMutation()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -28,11 +34,18 @@ export default function LoginForm() {
     },
   })
 
+  useEffect(() => {
+    if (clearTokens) {
+      setIsAuth(false)
+    }
+  }, [clearTokens, setIsAuth])
+
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return
     try {
       const result = await loginMutation.mutateAsync(data)
       toast({ title: result.payload.message })
+      setIsAuth(true)
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
     }

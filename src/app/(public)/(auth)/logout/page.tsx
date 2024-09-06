@@ -1,4 +1,5 @@
 'use client'
+import { useAppContext } from '@/components/app-provider'
 import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
@@ -9,6 +10,7 @@ import { useEffect, useRef, Suspense } from 'react'
 
 const LogoutComponent = () => {
   const router = useRouter()
+  const { setIsAuth } = useAppContext()
   const { mutateAsync } = useLogoutMutation()
   const ref = useRef<any>(null)
   const searchParams = useSearchParams()
@@ -18,19 +20,22 @@ const LogoutComponent = () => {
   // prevent double api request
   useEffect(() => {
     if (
-      ref.current ||
-      (refreshToken && refreshToken !== getRefreshTokenFromLocalStorage()) ||
-      (accessToken && accessToken !== getAccessTokenFromLocalStorage())
-    )
-      return
-    ref.current = true
-    mutateAsync().then(() => {
-      setTimeout(() => {
-        ref.current = null
-      }, 1000)
-      router.push('/login')
-    })
-  }, [accessToken, mutateAsync, refreshToken, router])
+      !ref.current &&
+      ((refreshToken && refreshToken === getRefreshTokenFromLocalStorage()) ||
+        (accessToken && accessToken === getAccessTokenFromLocalStorage()))
+    ) {
+      ref.current = mutateAsync
+      mutateAsync().then(() => {
+        setTimeout(() => {
+          ref.current = null
+        }, 1000)
+        router.push('/login')
+        setIsAuth(false)
+      })
+    } else {
+      router.push('/')
+    }
+  }, [accessToken, mutateAsync, setIsAuth, refreshToken, router])
 
   return <div>Logout...</div>
 }
