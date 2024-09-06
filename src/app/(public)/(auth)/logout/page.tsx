@@ -1,9 +1,6 @@
 'use client'
 import { useAppContext } from '@/components/app-provider'
-import {
-  getAccessTokenFromLocalStorage,
-  getRefreshTokenFromLocalStorage,
-} from '@/lib/utils'
+import { getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/use-auth'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, Suspense } from 'react'

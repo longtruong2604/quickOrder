@@ -45,9 +45,7 @@ export const CreateEmployeeAccountBody = z
     }
   })
 
-export type CreateEmployeeAccountBodyType = z.TypeOf<
-  typeof CreateEmployeeAccountBody
->
+export type CreateEmployeeAccountBodyType = z.TypeOf<typeof CreateEmployeeAccountBody>
 
 export const UpdateEmployeeAccountBody = z
   .object({
@@ -77,9 +75,7 @@ export const UpdateEmployeeAccountBody = z
     }
   })
 
-export type UpdateEmployeeAccountBodyType = z.TypeOf<
-  typeof UpdateEmployeeAccountBody
->
+export type UpdateEmployeeAccountBodyType = z.TypeOf<typeof UpdateEmployeeAccountBody>
 
 export const UpdateMeBody = z
   .object({

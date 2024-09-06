@@ -2,9 +2,7 @@ import accountApiRequest from '@/apiRequest/account'
 import { AccountResType } from '@/schemaValidations/account.schema'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-export const useAccountMeQuery = (
-  onSuccess?: (data: AccountResType) => void
-) => {
+export const useAccountMeQuery = (onSuccess?: (data: AccountResType) => void) => {
   return useQuery({
     queryKey: ['account-me'],
     queryFn: () =>

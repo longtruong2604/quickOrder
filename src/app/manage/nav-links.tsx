@@ -1,11 +1,6 @@
 'use client'
 import menuItems from '@/app/manage/menuItems'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { Package2, Settings } from 'lucide-react'
 import Link from 'next/link'
@@ -58,8 +53,7 @@ export default function NavLinks() {
                 className={cn(
                   'flex h-9 w-9 items-center justify-center rounded-lg  transition-colors hover:text-foreground md:h-8 md:w-8',
                   {
-                    'bg-accent text-accent-foreground':
-                      pathname === '/manage/setting',
+                    'bg-accent text-accent-foreground': pathname === '/manage/setting',
                     'text-muted-foreground': pathname !== '/manage/setting',
                   }
                 )}

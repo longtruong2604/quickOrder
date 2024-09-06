@@ -1,19 +1,9 @@
 'use client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 import RefreshToken from './refresh-token'
-import {
-  getAccessTokenFromLocalStorage,
-  removeTokensFromLocalStorage,
-} from '@/lib/utils'
+import { getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
 
 const queryClient = new QueryClient({
   defaultOptions: {

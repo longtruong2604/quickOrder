@@ -13,11 +13,7 @@ export default function DashboardMain() {
       <div className="flex flex-wrap gap-2">
         <div className="flex items-center">
           <span className="mr-2">Từ</span>
-          <Input
-            type="datetime-local"
-            placeholder="Từ ngày"
-            className="text-sm"
-          />
+          <Input type="datetime-local" placeholder="Từ ngày" className="text-sm" />
         </div>
         <div className="flex items-center">
           <span className="mr-2">Đến</span>
@@ -30,9 +26,7 @@ export default function DashboardMain() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Tổng doanh thu
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Tổng doanh thu</CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -97,9 +91,7 @@ export default function DashboardMain() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Bàn đang phục vụ
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Bàn đang phục vụ</CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
