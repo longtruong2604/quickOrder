@@ -41,11 +41,9 @@ export const handleErrorApi = ({
 
 const isBrowser = typeof window !== 'undefined'
 
-export const getRefreshTokenFromLocalStorage = () =>
-  isBrowser ? localStorage.getItem('refreshToken') : null
+export const getRefreshTokenFromLocalStorage = () => (isBrowser ? localStorage.getItem('refreshToken') : null)
 
-export const getAccessTokenFromLocalStorage = () =>
-  isBrowser ? localStorage.getItem('accessToken') : null
+export const getAccessTokenFromLocalStorage = () => (isBrowser ? localStorage.getItem('accessToken') : null)
 
 export const setAccessTokenToLocalStorage = (accessToken: string) =>
   isBrowser ? localStorage.setItem('accessToken', accessToken) : null
@@ -53,10 +51,14 @@ export const setAccessTokenToLocalStorage = (accessToken: string) =>
 export const setRefreshTokenToLocalStorage = (refreshToken: string) =>
   isBrowser ? localStorage.setItem('refreshToken', refreshToken) : null
 
-export const checkAndRefreshToken = async (param?: {
-  onError?: (error: any) => void
-  onSuccess?: () => void
-}) => {
+export const removeTokensFromLocalStorage = () => {
+  if (isBrowser) {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+  }
+}
+
+export const checkAndRefreshToken = async (param?: { onError?: (error?: any) => void; onSuccess?: () => void }) => {
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if (!accessToken || !refreshToken) return
@@ -64,16 +66,19 @@ export const checkAndRefreshToken = async (param?: {
     exp: number
     iat: number
   }
+
   const decodedRefreshToken = jwt.decode(refreshToken) as {
     exp: number
     iat: number
   }
-  const now = Math.round(new Date().getTime() / 1000)
-  if (decodedRefreshToken.exp <= now) return
-  if (
-    decodedAccessToken.exp - now <
-    (decodedAccessToken.exp - decodedAccessToken.iat) / 3
-  ) {
+
+  const now = new Date().getTime() / 1000 - 1
+  if (decodedRefreshToken.exp <= now) {
+    removeTokensFromLocalStorage()
+    param?.onError && param.onError()
+    return
+  }
+  if (decodedAccessToken.exp - now < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
     // Gọi API refresh token
     try {
       const res = await authApiRequest.refreshToken() //logout automatically because of http error 401

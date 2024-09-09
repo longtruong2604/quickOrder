@@ -14,12 +14,9 @@ const authApiRequest = {
     status: number
     payload: RefreshTokenResType
   }> | null,
-  login: (body: LoginBodyType) =>
-    http.post<LoginResType>('api/auth/login', body, { baseUrl: '' }), // baseUrl: "localhost:3000"
-  serverLogin: (body: LoginBodyType) =>
-    http.post<LoginResType>('auth/login', body), // baseUrl: "localhost:4000"
-  logout: () =>
-    http.post<MessageResType>('api/auth/logout', null, { baseUrl: '' }), // baseUrl: "localhost:3000"
+  login: (body: LoginBodyType) => http.post<LoginResType>('api/auth/login', body, { baseUrl: '' }), // baseUrl: "localhost:3000"
+  serverLogin: (body: LoginBodyType) => http.post<LoginResType>('auth/login', body), // baseUrl: "localhost:4000"
+  logout: () => http.post<MessageResType>('api/auth/logout', null, { baseUrl: '' }), // baseUrl: "localhost:3000"
   serverLogout: (body: LogoutBodyType & { accessToken: string }) =>
     http.post<MessageResType>(
       'auth/logout',
@@ -31,8 +28,7 @@ const authApiRequest = {
       }
     ), // baseUrl: "localhost:4000"
 
-  serverRefreshToken: (body: RefreshTokenBodyType) =>
-    http.post<RefreshTokenResType>('auth/refresh-token', body),
+  serverRefreshToken: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>('auth/refresh-token', body),
 
   //To prevent duplicate API request
   // This is a normal method, so the this keyword will refer to the object that calls the method.
@@ -41,13 +37,12 @@ const authApiRequest = {
     if (this.refreshTokenRequest) {
       return this.refreshTokenRequest
     }
-    this.refreshTokenRequest = http.post<RefreshTokenResType>(
-      '/api/auth/refresh-token',
-      null,
-      {
-        baseUrl: '',
-      }
-    )
+    this.refreshTokenRequest = http.post<RefreshTokenResType>('/api/auth/refresh-token', null, {
+      baseUrl: '',
+    }) as Promise<{
+      status: number
+      payload: RefreshTokenResType
+    }>
     const result = await this.refreshTokenRequest
     this.refreshTokenRequest = null
     return result

@@ -15,9 +15,11 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
 import { useAccountMeQuery } from '@/queries/use-account'
+import { useAppContext } from '@/components/app-provider'
 
 export default function DropdownAvatar() {
   const router = useRouter()
+  const { setIsAuth } = useAppContext()
   const { toast } = useToast()
 
   const { data } = useAccountMeQuery()
@@ -29,7 +31,7 @@ export default function DropdownAvatar() {
     try {
       const result = await logoutMutation.mutateAsync()
       toast({ title: result.payload.message })
-
+      setIsAuth(false)
       router.push('/')
     } catch (error) {
       handleErrorApi({ error })
@@ -39,19 +41,10 @@ export default function DropdownAvatar() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="overflow-hidden rounded-full"
-        >
+        <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
           <Avatar>
-            <AvatarImage
-              src={account?.avatar ?? undefined}
-              alt={account?.name}
-            />
-            <AvatarFallback>
-              {account?.name.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
+            <AvatarImage src={account?.avatar ?? undefined} alt={account?.name} />
+            <AvatarFallback>{account?.name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
