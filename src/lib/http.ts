@@ -67,7 +67,7 @@ let clientLogoutRequest: null | Promise<any> = null
 const isClient = typeof window !== 'undefined'
 
 const request = async <Response>(
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD',
   url: string,
   options?: CustomOptions | undefined
 ) => {
@@ -97,7 +97,7 @@ const request = async <Response>(
     method,
   })
 
-  const payload: Response = await res.json()
+  const payload: Response = method === 'HEAD' ? undefined : await res.json()
   const data = {
     status: res.status,
     payload,
@@ -163,6 +163,9 @@ const http = {
   },
   put<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
     return request<Response>('PUT', url, { ...options, body })
+  },
+  head<Response>(url: string, options?: CustomOptions | undefined) {
+    return request<Response>('HEAD', url, { ...options })
   },
   delete<Response>(url: string, options?: CustomOptions | undefined) {
     return request<Response>('DELETE', url, { ...options })

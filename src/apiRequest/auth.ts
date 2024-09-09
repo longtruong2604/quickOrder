@@ -39,7 +39,10 @@ const authApiRequest = {
     }
     this.refreshTokenRequest = http.post<RefreshTokenResType>('/api/auth/refresh-token', null, {
       baseUrl: '',
-    })
+    }) as Promise<{
+      status: number
+      payload: RefreshTokenResType
+    }>
     const result = await this.refreshTokenRequest
     this.refreshTokenRequest = null
     return result
