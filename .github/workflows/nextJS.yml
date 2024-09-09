@@ -42,7 +42,7 @@ jobs:
 
       # Step 4: Install dependencies using Yarn
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       # Step 5: Run ESLint to check code style (uses `next lint` based on your scripts)
       - name: Run ESLint
