@@ -11,10 +11,10 @@ import { useLoginMutation } from '@/queries/use-auth'
 import { useToast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
 import { useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useAppContext } from '@/components/app-provider'
 
-export default function LoginForm() {
+function LoginComponent() {
   const { toast } = useToast()
   const { setIsAuth } = useAppContext()
   const searchParams = useSearchParams()
@@ -100,3 +100,13 @@ export default function LoginForm() {
     </Card>
   )
 }
+
+const LoginForm = () => {
+  return (
+    <Suspense fallback={<div>Loading login...</div>}>
+      <LoginComponent />
+    </Suspense>
+  )
+}
+
+export default LoginForm
