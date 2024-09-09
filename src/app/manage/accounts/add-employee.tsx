@@ -18,8 +18,16 @@ import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useCheckEmailExistsMutation, useCreateEmpMutation } from '@/queries/use-account'
+import { useUploadMedia } from '@/queries/use-media'
+import { useToast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function AddEmployee() {
+  const { toast } = useToast()
+  const createEmpMutation = useCreateEmpMutation()
+  const checkEmailExistsMutation = useCheckEmailExistsMutation()
+  const uploadMedia = useUploadMedia()
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
@@ -42,6 +50,34 @@ export default function AddEmployee() {
     return avatar
   }, [file, avatar])
 
+  const reset = () => {
+    form.reset()
+    setFile(null)
+  }
+
+  const handleSubmit = form.handleSubmit(async (data: CreateEmployeeAccountBodyType) => {
+    if (createEmpMutation.isPending) return
+    try {
+      let body = data
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const uploadImgRes = await uploadMedia.mutateAsync(formData)
+        const imgurl = uploadImgRes.payload.data
+        body = { ...data, avatar: imgurl }
+      }
+      const res = await createEmpMutation.mutateAsync(body)
+      reset()
+      setOpen(false)
+      toast({ title: res.payload.message })
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      })
+    }
+  })
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -56,7 +92,12 @@ export default function AddEmployee() {
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="add-employee-form">
+          <form
+            noValidate
+            onSubmit={handleSubmit}
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="add-employee-form"
+          >
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}
@@ -117,7 +158,32 @@ export default function AddEmployee() {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="email">Email</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="email" className="w-full" {...field} />
+                        <Input
+                          id="email"
+                          className="w-full"
+                          {...field}
+                          onBlur={async () => {
+                            try {
+                              const response = await checkEmailExistsMutation.mutateAsync(field.value)
+                              console.log(response)
+                              if (response.status === 200) {
+                                console.log('hehe')
+                                form.setError('email', {
+                                  message: 'Email already exists',
+                                })
+                              } else {
+                                form.clearErrors('email')
+                              }
+                            } catch (error: any) {
+                              // Check if the error is due to a 404, meaning the email doesn't exist
+                              if (error.response?.status === 404) {
+                                form.clearErrors('email') // No error if the email doesn't exist
+                              } else {
+                                console.error('Unexpected error checking email', error)
+                              }
+                            }
+                          }}
+                        />
                         <FormMessage />
                       </div>
                     </div>

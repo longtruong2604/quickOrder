@@ -1,6 +1,6 @@
 import accountApiRequest from '@/apiRequest/account'
-import { AccountResType } from '@/schemaValidations/account.schema'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { AccountResType, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useAccountMeQuery = (onSuccess?: (data: AccountResType) => void) => {
   return useQuery({
@@ -24,5 +24,63 @@ export const useChangePasswordMutation = () => {
   return useMutation({
     mutationKey: ['change-password'],
     mutationFn: accountApiRequest.changePassword,
+  })
+}
+
+export const useAccountListQuery = () => {
+  return useQuery({
+    queryKey: ['account-list'],
+    queryFn: accountApiRequest.list,
+  })
+}
+
+export const useCreateEmpMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['create-emp'],
+    mutationFn: accountApiRequest.createEmp,
+    onSuccess: () => {
+      // Invalidate the account list query to refetch the data
+      queryClient.invalidateQueries({ queryKey: ['account-list'] })
+    },
+  })
+}
+
+export const useCheckEmailExistsMutation = () => {
+  return useMutation({
+    mutationKey: ['check-email'],
+    mutationFn: accountApiRequest.checkEmail,
+  })
+}
+
+export const useGetEmpQuery = ({ id }: { id: number }) => {
+  return useQuery({
+    queryKey: ['get-emp', id],
+    queryFn: () => accountApiRequest.getEmp(id),
+  })
+}
+
+export const useUpdateEmpMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['update-emp'],
+    mutationFn: ({ id, ...body }: UpdateEmployeeAccountBodyType & { id: number }) =>
+      accountApiRequest.updateEmp(body, id),
+    onSuccess: () => {
+      // Invalidate the account list query to refetch the data
+      queryClient.invalidateQueries({ queryKey: ['account-list'] })
+    },
+  })
+}
+
+export const useDeleteEmpMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationKey: ['delete-emp'],
+    mutationFn: accountApiRequest.deleteEmp,
+    onSuccess: () => {
+      // Invalidate the account list query to refetch the data
+      queryClient.invalidateQueries({ queryKey: ['account-list'] })
+    },
   })
 }
