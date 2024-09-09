@@ -13,11 +13,15 @@ import { Label } from '@/components/ui/label'
 import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
+import { useGetEmpQuery, useUpdateEmpMutation } from '@/queries/use-account'
+import { useUploadMedia } from '@/queries/use-media'
+import { handleErrorApi } from '@/lib/utils'
+import { useToast } from '@/components/ui/use-toast'
 
 export default function EditEmployee({
   id,
@@ -29,6 +33,11 @@ export default function EditEmployee({
 }) {
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
+  const uploadMedia = useUploadMedia()
+  const { toast } = useToast()
+  const getEmpQuery = useGetEmpQuery({ enabled: Boolean(id), id: id as number })
+  const updateEmp = useUpdateEmpMutation()
+  const employeeData = getEmpQuery.data?.payload.data
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: {
@@ -40,6 +49,20 @@ export default function EditEmployee({
       changePassword: false,
     },
   })
+
+  useEffect(() => {
+    if (employeeData) {
+      form.reset({
+        name: employeeData.name,
+        email: employeeData.email,
+        avatar: employeeData.avatar ?? undefined,
+        changePassword: form.getValues('changePassword'),
+        confirmPassword: form.getValues('confirmPassword'),
+        password: form.getValues('password'),
+      })
+    }
+  }, [employeeData, form])
+
   const avatar = form.watch('avatar')
   const name = form.watch('name')
   const changePassword = form.watch('changePassword')
@@ -50,12 +73,42 @@ export default function EditEmployee({
     return avatar
   }, [file, avatar])
 
+  const handleSubmit = form.handleSubmit(
+    async (data: UpdateEmployeeAccountBodyType) => {
+      if (updateEmp.isPending) return
+      try {
+        let body = { id, ...data }
+        if (file) {
+          const formData = new FormData()
+          formData.append('file', file)
+          const uploadImgRes = await uploadMedia.mutateAsync(formData)
+          const imgurl = uploadImgRes.payload.data
+          body = { ...data, avatar: imgurl, id }
+        }
+        const res = await updateEmp.mutateAsync({ ...body, id: id as number })
+        toast({ title: res.payload.message })
+        reset()
+      } catch (error) {
+        handleErrorApi({
+          error,
+          setError: form.setError,
+        })
+      }
+    },
+    (error) => console.log(error)
+  )
+
+  const reset = () => {
+    setId(undefined)
+    setFile(null)
+  }
+
   return (
     <Dialog
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          setId(undefined)
+          reset()
         }
       }}
     >
@@ -65,7 +118,12 @@ export default function EditEmployee({
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="edit-employee-form">
+          <form
+            noValidate
+            onSubmit={handleSubmit}
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="edit-employee-form"
+          >
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}

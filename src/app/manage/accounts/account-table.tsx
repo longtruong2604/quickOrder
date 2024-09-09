@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
+import { useAccountListQuery, useDeleteEmpMutation } from '@/queries/use-account'
 
 type AccountItem = AccountListResType['data'][0]
 
@@ -131,6 +132,19 @@ function AlertDialogDeleteAccount({
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
 }) {
+  const deleteEmployeeMutation = useDeleteEmpMutation()
+  const handleDelete = async () => {
+    if (!employeeDelete) return
+    try {
+      const res = await deleteEmployeeMutation.mutateAsync(employeeDelete.id)
+      console.log(res)
+    } catch (error: any) {
+      console.error('Error deleting employee', error)
+    }
+
+    setEmployeeDelete(null)
+  }
+
   return (
     <AlertDialog
       open={Boolean(employeeDelete)}
@@ -150,7 +164,7 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -164,8 +178,9 @@ export default function AccountTable() {
   const pageIndex = page - 1
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
+  const employeeAccountList = useAccountListQuery()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
+  const data: any[] = employeeAccountList.data?.payload.data ?? []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})

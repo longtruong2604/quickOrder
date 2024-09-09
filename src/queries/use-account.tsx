@@ -53,10 +53,11 @@ export const useCheckEmailExistsMutation = () => {
   })
 }
 
-export const useGetEmpQuery = ({ id }: { id: number }) => {
+export const useGetEmpQuery = ({ id, enabled }: { id: number; enabled: boolean }) => {
   return useQuery({
     queryKey: ['get-emp', id],
     queryFn: () => accountApiRequest.getEmp(id),
+    enabled,
   })
 }
 
