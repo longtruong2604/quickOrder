@@ -55,28 +55,31 @@ export default function AddEmployee() {
     setFile(null)
   }
 
-  const handleSubmit = form.handleSubmit(async (data: CreateEmployeeAccountBodyType) => {
-    if (createEmpMutation.isPending) return
-    try {
-      let body = data
-      if (file) {
-        const formData = new FormData()
-        formData.append('file', file)
-        const uploadImgRes = await uploadMedia.mutateAsync(formData)
-        const imgurl = uploadImgRes.payload.data
-        body = { ...data, avatar: imgurl }
+  const handleSubmit = form.handleSubmit(
+    async (data: CreateEmployeeAccountBodyType) => {
+      if (createEmpMutation.isPending) return
+      try {
+        let body = data
+        if (file) {
+          const formData = new FormData()
+          formData.append('file', file)
+          const uploadImgRes = await uploadMedia.mutateAsync(formData)
+          const imgurl = uploadImgRes.payload.data
+          body = { ...data, avatar: imgurl }
+        }
+        const res = await createEmpMutation.mutateAsync(body)
+        reset()
+        setOpen(false)
+        toast({ title: res.payload.message })
+      } catch (error) {
+        handleErrorApi({
+          error,
+          setError: form.setError,
+        })
       }
-      const res = await createEmpMutation.mutateAsync(body)
-      reset()
-      setOpen(false)
-      toast({ title: res.payload.message })
-    } catch (error) {
-      handleErrorApi({
-        error,
-        setError: form.setError,
-      })
-    }
-  })
+    },
+    (error) => console.log(error)
+  )
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
@@ -165,9 +168,7 @@ export default function AddEmployee() {
                           onBlur={async () => {
                             try {
                               const response = await checkEmailExistsMutation.mutateAsync(field.value)
-                              console.log(response)
                               if (response.status === 200) {
-                                console.log('hehe')
                                 form.setError('email', {
                                   message: 'Email already exists',
                                 })
@@ -175,7 +176,6 @@ export default function AddEmployee() {
                                 form.clearErrors('email')
                               }
                             } catch (error: any) {
-                              // Check if the error is due to a 404, meaning the email doesn't exist
                               if (error.response?.status === 404) {
                                 form.clearErrors('email') // No error if the email doesn't exist
                               } else {
