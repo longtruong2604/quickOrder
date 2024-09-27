@@ -5,6 +5,8 @@ import { EntityError } from './http'
 import { toast } from '@/components/ui/use-toast'
 import jwt from 'jsonwebtoken'
 import authApiRequest from '@/apiRequest/auth'
+import { DishStatus, TableStatus } from '@/constants/type'
+import envConfig from '../../config'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -89,4 +91,34 @@ export const checkAndRefreshToken = async (param?: { onError?: (error?: any) => 
       param?.onError && param.onError(error)
     }
   }
+}
+
+export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
+  switch (status) {
+    case 'Available':
+      return 'Có sẵn'
+    case 'Unavailable':
+      return 'Hết hàng'
+    default:
+      return 'Ẩn'
+  }
+}
+
+export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof typeof TableStatus]) => {
+  switch (status) {
+    case 'Available':
+      return 'Có sẵn'
+    case 'Reserved':
+      return 'Đã đặt'
+    default:
+      return 'Ẩn'
+  }
+}
+
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+}
+
+export const getTableLink = ({ token, tableId }: { token: string; tableId: number }) => {
+  return envConfig.NEXT_PUBLIC_URL + `/table/${tableId}?token=${token}`
 }
