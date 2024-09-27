@@ -16,11 +16,11 @@ export const useGetDishQuery = (id: number) => {
   })
 }
 
-export const useCreateDishMutation = (body: CreateDishBodyType) => {
+export const useCreateDishMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['create-dish'],
-    mutationFn: () => dishesApiRequest.createDish(body),
+    mutationFn: (body: CreateDishBodyType) => dishesApiRequest.createDish(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dish-list'] })
     },
