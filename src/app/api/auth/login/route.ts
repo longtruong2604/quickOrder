@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           message: 'Something went wrong',
+          message2: (error as any).message,
         },
         {
           status: 500,
