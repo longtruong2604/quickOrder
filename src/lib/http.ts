@@ -84,7 +84,7 @@ const request = async <Response>(
 
   // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.API_ENDPOINT:http://localhost:4000
   // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server:http://localhost:3000
-  const baseUrl = options?.baseUrl === undefined ? envConfig.API_ENDPOINT : options.baseUrl
+  const baseUrl = options?.baseUrl === undefined ? envConfig.NEXT_PUBLIC_API_ENDPOINT : options.baseUrl
 
   const fullUrl = `${baseUrl}/${normalizePath(url)}`
   const res = await fetch(fullUrl, {
@@ -159,6 +159,7 @@ const http = {
     return request<Response>('GET', url, options)
   },
   post<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {
+    console.log('hehe')
     return request<Response>('POST', url, { ...options, body })
   },
   put<Response>(url: string, body: any, options?: Omit<CustomOptions, 'body'> | undefined) {

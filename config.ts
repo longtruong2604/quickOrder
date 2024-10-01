@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
 const configSchema = z.object({
-  API_ENDPOINT: z.string(),
+  NEXT_PUBLIC_API_ENDPOINT: z.string(),
   NEXT_PUBLIC_URL: z.string(),
 })
 
 const configProject = configSchema.safeParse({
-  API_ENDPOINT: process.env.API_ENDPOINT,
+  NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
   NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
 })
 
