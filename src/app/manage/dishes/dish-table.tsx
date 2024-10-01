@@ -43,6 +43,7 @@ import AutoPagination from '@/components/auto-pagination'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import EditDish from '@/app/manage/dishes/edit-dish'
 import AddDish from '@/app/manage/dishes/add-dish'
+import { useDeleteDishMutation, useGetDishListQuery } from '@/queries/use-dish'
 
 type DishItem = DishListResType['data'][0]
 
@@ -136,6 +137,20 @@ function AlertDialogDeleteDish({
   dishDelete: DishItem | null
   setDishDelete: (value: DishItem | null) => void
 }) {
+  const deleteDishMutation = useDeleteDishMutation()
+
+  const handleDelete = async () => {
+    if (!dishDelete) return
+    try {
+      const res = await deleteDishMutation.mutateAsync(dishDelete.id)
+      console.log(res)
+    } catch (error: any) {
+      console.error('Error deleting employee', error)
+    }
+
+    setDishDelete(null)
+  }
+
   return (
     <AlertDialog
       open={Boolean(dishDelete)}
@@ -155,7 +170,7 @@ function AlertDialogDeleteDish({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -169,7 +184,8 @@ export default function DishTable() {
   const pageIndex = page - 1
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>()
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null)
-  const data: any[] = []
+  const getDishListQuery = useGetDishListQuery()
+  const data: any[] = getDishListQuery.data?.payload.data ?? []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
