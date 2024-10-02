@@ -1,4 +1,18 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '4000',
+      },
+      {
+        protocol: 'https',
+        hostname: 'longtruong-uploads.s3.ap-southeast-2.amazonaws.com',
+      },
+    ],
+  },
+}
 
 export default nextConfig
