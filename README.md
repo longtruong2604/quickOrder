@@ -1,5 +1,5 @@
 ## About Quick Order:
-This is an undergoing project meant for managing restaurant as well as customer orders.
+This is an undergoing project meant for managing restaurant as well as customer orders. Users can make order by scanning the QR code on their table, this will navigate them to an ordering screen where they can choose their dishes from the menu upon their liking. 
 
 ## Key Features:
 - [x] Username - password authentication (Implemented)
