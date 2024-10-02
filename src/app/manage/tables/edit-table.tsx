@@ -12,6 +12,8 @@ import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Switch } from '@/components/ui/switch'
 import Link from 'next/link'
+import { useGetTableQuery } from '@/queries/use-table'
+import { useEffect, useRef } from 'react'
 
 export default function EditTable({
   id,
@@ -22,6 +24,8 @@ export default function EditTable({
   setId: (value: number | undefined) => void
   _onSubmitSuccess?: () => void
 }) {
+  const getTableQuery = useGetTableQuery({ enabled: Boolean(id), id: id as number })
+  const data = getTableQuery.data?.payload.data
   const form = useForm<UpdateTableBodyType>({
     resolver: zodResolver(UpdateTableBody),
     defaultValues: {
@@ -30,7 +34,14 @@ export default function EditTable({
       changeToken: false,
     },
   })
-  const tableNumber = 0
+  const tableNumberRef = useRef(0)
+
+  useEffect(() => {
+    if (data) {
+      form.reset(data)
+      tableNumberRef.current = data.number
+    }
+  }, [data, form])
 
   return (
     <Dialog
@@ -58,7 +69,7 @@ export default function EditTable({
                 <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                   <Label htmlFor="name">Số hiệu bàn</Label>
                   <div className="col-span-3 w-full space-y-2">
-                    <Input id="number" type="number" className="w-full" value={tableNumber} readOnly />
+                    <Input id="number" type="number" className="w-full" value={tableNumberRef.current} readOnly />
                     <FormMessage />
                   </div>
                 </div>
@@ -138,14 +149,14 @@ export default function EditTable({
                     <Link
                       href={getTableLink({
                         token: '123123123',
-                        tableId: tableNumber,
+                        tableId: tableNumberRef.current,
                       })}
                       target="_blank"
                       className="break-all"
                     >
                       {getTableLink({
                         token: '123123123',
-                        tableId: tableNumber,
+                        tableId: tableNumberRef.current,
                       })}
                     </Link>
                   </div>
