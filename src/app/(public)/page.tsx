@@ -1,4 +1,5 @@
 import dishesApiRequest from '@/apiRequest/dish'
+import { revalidateRequest } from '@/apiRequest/revalidate-tag'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
 
@@ -6,6 +7,7 @@ export default async function Home() {
   let dishes: DishListResType['data'] = []
   try {
     const res = await dishesApiRequest.list()
+    revalidateRequest.revalidateTag('dishes')
     dishes = [...res.payload.data]
     console.log(res)
   } catch (error: any) {
