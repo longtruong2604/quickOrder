@@ -12,9 +12,11 @@ import { getVietnameseTableStatus } from '@/lib/utils'
 import { CreateTableBody, CreateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useCreateTableMutation } from '@/queries/use-table'
 
 export default function AddTable() {
   const [open, setOpen] = useState(false)
+  const createTableMutation = useCreateTableMutation()
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: {
@@ -23,6 +25,21 @@ export default function AddTable() {
       status: TableStatus.Hidden,
     },
   })
+
+  const handleSubmit = form.handleSubmit(
+    async (data: CreateTableBodyType) => {
+      if (createTableMutation.isPending) return
+      try {
+        await createTableMutation.mutateAsync(data)
+        form.reset()
+        setOpen(false)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    (error) => console.log(error)
+  )
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -36,7 +53,12 @@ export default function AddTable() {
           <DialogTitle>Thêm bàn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="add-table-form">
+          <form
+            noValidate
+            onSubmit={handleSubmit}
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="add-table-form"
+          >
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}

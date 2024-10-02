@@ -69,21 +69,21 @@ export default function EditDish({
   }
 
   const handleSubmit = form.handleSubmit(
-    () => {
+    async (data: UpdateDishBodyType) => {
       if (editDishMutation.isPending) return
-      const body = form.getValues()
+      const body = data
       try {
         if (file) {
           const formData = new FormData()
           formData.append('file', file)
-          mediaApiRequest.upload(formData).then((res) => {
-            if (res.payload) body.image = res.payload.data
-          })
+          const res = await mediaApiRequest.upload(formData)
+          if (res.payload) body.image = res.payload.data
         }
-        editDishMutation.mutateAsync({ id: id!, ...body }).then(() => {
+        const res = await editDishMutation.mutateAsync({ id: id!, ...body })
+        if (res.payload) {
           setId(undefined)
           reset()
-        })
+        }
       } catch (error) {
         console.log(error)
       }
