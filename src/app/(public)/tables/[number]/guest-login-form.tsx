@@ -7,13 +7,13 @@ import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
-import { useLoginMutation } from '@/queries/use-guest-auth'
+import { useGuestLoginMutation } from '@/queries/use-guest-auth'
 import { useSearchParams } from 'next/navigation'
 
 export default function GuestLoginForm({ tableNumber }: { tableNumber: string }) {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
-  const loginMutation = useLoginMutation()
+  const loginMutation = useGuestLoginMutation()
   const form = useForm<GuestLoginBodyType>({
     resolver: zodResolver(GuestLoginBody),
     defaultValues: {

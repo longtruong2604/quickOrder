@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { normalizePath } from './utils'
+import { normalizePath, removeTokensFromLocalStorage } from './utils'
 import { LoginResType } from '@/schemaValidations/auth.schema'
 import envConfig from '../../config'
 
@@ -126,8 +126,7 @@ const request = async <Response>(
             await clientLogoutRequest
           } catch (error) {
           } finally {
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('refreshToken')
+            removeTokensFromLocalStorage()
             clientLogoutRequest = null
             location.href = '/login'
             // Maybe cause infinite loop, remember to check here
@@ -144,12 +143,11 @@ const request = async <Response>(
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isClient) {
     const normalizeUrl = normalizePath(url)
-    if (normalizeUrl === 'api/auth/login') {
+    if (['api/auth/login', 'api/guest/auth/login'].includes(normalizeUrl)) {
       localStorage.setItem('accessToken', (payload as LoginResType).data.accessToken)
       localStorage.setItem('refreshToken', (payload as LoginResType).data.refreshToken)
-    } else if (normalizeUrl === 'api/auth/logout') {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
+    } else if (['api/auth/logout', 'api/guest/auth/logout'].includes(normalizeUrl)) {
+      removeTokensFromLocalStorage()
     }
   }
   return data
