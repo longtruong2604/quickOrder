@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       expires: decodedRefreshToken.exp * 1000,
     })
     return Response.json(payload)
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof HttpError) {
       return Response.json(error.payload, {
         status: error.status,
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           message: 'Something went wrong',
-          message2: (error as any).message,
+          message2: error.message,
         },
         {
           status: 500,

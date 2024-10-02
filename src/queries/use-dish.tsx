@@ -9,10 +9,11 @@ export const useGetDishListQuery = () => {
   })
 }
 
-export const useGetDishQuery = (id: number) => {
+export const useGetDishQuery = ({ enabled, id }: { enabled: boolean; id: number }) => {
   return useQuery({
     queryKey: ['get-dish', id],
     queryFn: () => dishesApiRequest.getDish(id),
+    enabled,
   })
 }
 
