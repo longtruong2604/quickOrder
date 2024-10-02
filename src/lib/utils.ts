@@ -5,8 +5,10 @@ import { EntityError } from './http'
 import { toast } from '@/components/ui/use-toast'
 import jwt from 'jsonwebtoken'
 import authApiRequest from '@/apiRequest/auth'
-import { DishStatus, TableStatus } from '@/constants/type'
+import { DishStatus, Role, TableStatus } from '@/constants/type'
 import envConfig from '../../config'
+import { TokenPayload } from '@/types/jwt.types'
+import guestAuthApiRequest from '@/apiRequest/guest-auth'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -64,15 +66,8 @@ export const checkAndRefreshToken = async (param?: { onError?: (error?: any) => 
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if (!accessToken || !refreshToken) return
-  const decodedAccessToken = jwt.decode(accessToken) as {
-    exp: number
-    iat: number
-  }
-
-  const decodedRefreshToken = jwt.decode(refreshToken) as {
-    exp: number
-    iat: number
-  }
+  const decodedAccessToken = decodeToken(accessToken)
+  const decodedRefreshToken = decodeToken(refreshToken)
 
   const now = new Date().getTime() / 1000 - 1
   if (decodedRefreshToken.exp <= now) {
@@ -82,8 +77,9 @@ export const checkAndRefreshToken = async (param?: { onError?: (error?: any) => 
   }
   if (decodedAccessToken.exp - now < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
     // Gọi API refresh token
+    const role = decodedRefreshToken.role
     try {
-      const res = await authApiRequest.refreshToken() //logout automatically because of http error 401
+      const res = role === Role.Guest ? await guestAuthApiRequest.refreshToken() : await authApiRequest.refreshToken() //logout automatically because of http error 401
       setAccessTokenToLocalStorage(res.payload.data.accessToken)
       setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
       param?.onSuccess && param.onSuccess()
@@ -120,5 +116,9 @@ export const formatCurrency = (value: number) => {
 }
 
 export const getTableLink = ({ token, tableId }: { token: string; tableId: number }) => {
-  return envConfig.NEXT_PUBLIC_URL + `/table/${tableId}?token=${token}`
+  return envConfig.NEXT_PUBLIC_URL + `/tables/${tableId}?token=${token}`
+}
+
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload
 }

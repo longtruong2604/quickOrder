@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { Role } from './constants/type'
+import { decodeToken } from './lib/utils'
 
-const privatePaths = ['/manage']
+const guestPath = ['/guest']
+const privatePaths = ['/manage', ...guestPath]
 const unAuthPaths = ['/login']
 
 // This function can be marked `async` if using `await` inside
@@ -16,22 +19,36 @@ export function middleware(request: NextRequest) {
     url.searchParams.set('clearTokens', 'true')
     return NextResponse.redirect(url)
   }
-  // Đăng nhập rồi thì sẽ không cho vào login nữa
-  if (unAuthPaths.some((path) => pathname.startsWith(path)) && refreshToken) {
-    return NextResponse.redirect(new URL('/', request.url))
+
+  if (refreshToken) {
+    console.log('refreshToken', refreshToken)
+    // Đăng nhập rồi thì sẽ không cho vào login nữa
+    if (unAuthPaths.some((path) => pathname.startsWith(path))) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+    // Is authenticated but access token is expired
+    if (privatePaths.some((path) => pathname.startsWith(path)) && !accessToken) {
+      const url = new URL('/refresh-token', request.url)
+      // can only logout if refresh token is valid
+      url.searchParams.set('refresh_token', refreshToken)
+      url.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(url)
+    }
+    // Wrong path with wrong permission
+    const role = decodeToken(refreshToken).role
+    console.log('role', role)
+    if (
+      (role !== Role.Guest && guestPath.some((path) => pathname.startsWith(path))) ||
+      (role === Role.Guest && !guestPath.some((path) => pathname.startsWith(path)))
+    ) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
-  // Is authenticated but access token is expired
-  if (privatePaths.some((path) => pathname.startsWith(path)) && !accessToken && refreshToken) {
-    const url = new URL('/refresh-token', request.url)
-    // can only logout if refresh token is valid
-    url.searchParams.set('refresh_token', refreshToken)
-    url.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(url)
-  }
+
   return NextResponse.next()
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/manage/:path*', '/login'],
+  matcher: ['/manage/:path*', '/login', '/guest/:path*'],
 }

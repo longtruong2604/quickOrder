@@ -19,7 +19,7 @@ import { useAppContext } from '@/components/app-provider'
 
 export default function DropdownAvatar() {
   const router = useRouter()
-  const { setIsAuth } = useAppContext()
+  const { setRole } = useAppContext()
   const { toast } = useToast()
 
   const { data } = useAccountMeQuery()
@@ -31,7 +31,7 @@ export default function DropdownAvatar() {
     try {
       const result = await logoutMutation.mutateAsync()
       toast({ title: result.payload.message })
-      setIsAuth(false)
+      setRole(undefined)
       router.push('/')
     } catch (error) {
       handleErrorApi({ error })

@@ -42,7 +42,7 @@ import AutoPagination from '@/components/auto-pagination'
 import { TableListResType } from '@/schemaValidations/table.schema'
 import EditTable from '@/app/manage/tables/edit-table'
 import AddTable from '@/app/manage/tables/add-table'
-import { useGetTableListQuery } from '@/queries/use-table'
+import { useDeleteTableMutation, useGetTableListQuery } from '@/queries/use-table'
 import QRCodeComp from './qr-code'
 
 type TableItem = TableListResType['data'][0]
@@ -119,6 +119,20 @@ function AlertDialogDeleteTable({
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
 }) {
+  const deleteTableMutation = useDeleteTableMutation()
+
+  const handleDeleteTable = async () => {
+    if (!tableDelete) return
+    try {
+      const res = await deleteTableMutation.mutateAsync(tableDelete.number)
+      console.log(res)
+    } catch (error: any) {
+      console.error('Error deleting employee', error)
+    }
+
+    setTableDelete(null)
+  }
+
   return (
     <AlertDialog
       open={Boolean(tableDelete)}
@@ -138,7 +152,7 @@ function AlertDialogDeleteTable({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDeleteTable}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
