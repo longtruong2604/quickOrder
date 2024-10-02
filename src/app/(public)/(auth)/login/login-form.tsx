@@ -16,7 +16,7 @@ import { useAppContext } from '@/components/app-provider'
 
 function LoginComponent() {
   const { toast } = useToast()
-  const { setIsAuth } = useAppContext()
+  const { setRole } = useAppContext()
   const searchParams = useSearchParams()
   const clearTokens = searchParams.get('clear_tokens')
   const loginMutation = useLoginMutation()
@@ -30,16 +30,16 @@ function LoginComponent() {
 
   useEffect(() => {
     if (clearTokens) {
-      setIsAuth(false)
+      setRole(undefined)
     }
-  }, [clearTokens, setIsAuth])
+  }, [clearTokens, setRole])
 
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return
     try {
       const result = await loginMutation.mutateAsync(data)
       toast({ title: result.payload.message })
-      setIsAuth(true)
+      setRole(result.payload.data.account.role)
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
     }

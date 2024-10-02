@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken'
 import authApiRequest from '@/apiRequest/auth'
 import { DishStatus, TableStatus } from '@/constants/type'
 import envConfig from '../../config'
+import { TokenPayload } from '@/types/jwt.types'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -120,5 +121,9 @@ export const formatCurrency = (value: number) => {
 }
 
 export const getTableLink = ({ token, tableId }: { token: string; tableId: number }) => {
-  return envConfig.NEXT_PUBLIC_URL + `/table/${tableId}?token=${token}`
+  return envConfig.NEXT_PUBLIC_URL + `/tables/${tableId}?token=${token}`
+}
+
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload
 }

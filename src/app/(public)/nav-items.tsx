@@ -25,9 +25,9 @@ const menuItems = [
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const { isAuth } = useAppContext()
+  const { role } = useAppContext()
   return menuItems.map((item) => {
-    if ((item.authRequired === false && isAuth) || (item.authRequired === true && !isAuth)) return null
+    if ((item.authRequired === false && role) || (item.authRequired === true && !role)) return null
     return (
       <Link href={item.href} key={item.href} className={className}>
         {item.title}

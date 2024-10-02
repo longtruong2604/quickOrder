@@ -7,7 +7,7 @@ import { useEffect, useRef, Suspense } from 'react'
 
 const LogoutComponent = () => {
   const router = useRouter()
-  const { setIsAuth } = useAppContext()
+  const { setRole } = useAppContext()
   const { mutateAsync } = useLogoutMutation()
   const ref = useRef<any>(null)
   const searchParams = useSearchParams()
@@ -27,12 +27,12 @@ const LogoutComponent = () => {
           ref.current = null
         }, 1000)
         router.push('/login')
-        setIsAuth(false)
+        setRole(undefined)
       })
     } else {
       router.push('/')
     }
-  }, [accessToken, mutateAsync, setIsAuth, refreshToken, router])
+  }, [accessToken, mutateAsync, refreshToken, router, setRole])
 
   return <div>Logout...</div>
 }
