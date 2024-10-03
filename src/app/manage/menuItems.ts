@@ -1,6 +1,12 @@
-import { Home, LineChart, ShoppingCart, Users2, Salad, Table } from 'lucide-react'
+import { Home, LineChart, ShoppingCart, Users2, Salad, Table, LucideProps } from 'lucide-react'
+import { ForwardRefExoticComponent, RefAttributes } from 'react'
 
-const menuItems = [
+const menuItems: {
+  title: string
+  Icon: ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>>
+  href: string
+  comingSoon?: boolean
+}[] = [
   {
     title: 'Dashboard',
     Icon: Home,
@@ -10,6 +16,7 @@ const menuItems = [
     title: 'Đơn hàng',
     Icon: ShoppingCart,
     href: '/manage/orders',
+    comingSoon: true,
   },
   {
     title: 'Bàn ăn',
@@ -26,6 +33,7 @@ const menuItems = [
     title: 'Phân tích',
     Icon: LineChart,
     href: '/manage/analytics',
+    comingSoon: true,
   },
   {
     title: 'Nhân viên',
