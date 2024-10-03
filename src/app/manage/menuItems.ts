@@ -16,7 +16,6 @@ const menuItems: {
     title: 'Đơn hàng',
     Icon: ShoppingCart,
     href: '/manage/orders',
-    comingSoon: true,
   },
   {
     title: 'Bàn ăn',

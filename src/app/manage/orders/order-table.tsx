@@ -132,7 +132,7 @@ export default function OrderTable() {
       }}
     >
       <div className="w-full">
-        <EditOrder id={orderIdEdit} setId={setOrderIdEdit} onSubmitSuccess={() => {}} />
+        <EditOrder id={orderIdEdit} setId={setOrderIdEdit} _onSubmitSuccess={() => {}} />
         <div className=" flex items-center">
           <div className="flex flex-wrap gap-2">
             <div className="flex items-center">
