@@ -17,6 +17,7 @@ const DishSnapshotSchema = z.object({
 export const OrderSchema = z.object({
   id: z.number(),
   guestId: z.number().nullable(),
+  // price: z.number(),
   guest: z
     .object({
       id: z.number(),

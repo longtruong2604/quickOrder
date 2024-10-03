@@ -1,15 +1,20 @@
 'use client'
 import { Button } from '@/components/ui/button'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, handleErrorApi } from '@/lib/utils'
 import { useGetDishListQuery } from '@/queries/use-dish'
 import { GuestCreateOrdersBodyType } from '@/schemaValidations/guest.schema'
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import QuantityCounter from './quantity-counter'
+import { useCreateGuestOrderMutation } from '@/queries/use-guest'
+import { useToast } from '@/components/ui/use-toast'
+import { DishStatus } from '@/constants/type'
 
 const MenuOrder = () => {
   const [orders, setOrder] = useState<GuestCreateOrdersBodyType>([])
   const dishesQuery = useGetDishListQuery()
+  const { toast } = useToast()
+  const createGuestOrdersMutation = useCreateGuestOrderMutation()
   const dishes = useMemo(() => dishesQuery.data?.payload.data ?? [], [dishesQuery])
   const newTotalPrice = useMemo(
     () =>
@@ -36,36 +41,54 @@ const MenuOrder = () => {
     })
   }
 
+  const handleOrder = async () => {
+    console.log(orders)
+    if (createGuestOrdersMutation.isPending) return
+    try {
+      const guestOrderRes = await createGuestOrdersMutation.mutateAsync(orders)
+      console.log(guestOrderRes)
+      toast({ title: guestOrderRes.payload.message })
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
   return (
     <>
-      {dishes.map((dish) => (
-        <div key={dish.id} className="flex gap-4">
-          <div className="flex-shrink-0">
-            <Image
-              src={dish.image}
-              alt={dish.name}
-              height={100}
-              width={100}
-              quality={100}
-              className="object-cover w-[80px] h-[80px] rounded-md"
-            />
+      {dishes
+        .filter((dish) => dish.status !== DishStatus.Hidden)
+        .map((dish) => (
+          <div key={dish.id} className="flex gap-4">
+            <div className="flex-shrink-0 relative">
+              {dish.status === DishStatus.Unavailable && (
+                <span className="inset-0 h-full text-sm absolute w-full flex justify-center items-center bg-black/50">
+                  Hết hàng
+                </span>
+              )}
+              <Image
+                src={dish.image}
+                alt={dish.name}
+                height={100}
+                width={100}
+                quality={100}
+                className="object-cover w-[80px] h-[80px] rounded-md"
+              />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm">{dish.name}</h3>
+              <p className="text-xs">{dish.description}</p>
+              <p className="text-xs font-semibold">{formatCurrency(dish.price)}</p>
+            </div>
+            <div className="flex-shrink-0 ml-auto flex justify-center items-center">
+              <QuantityCounter
+                onChange={(value) => handleOrderChange(dish.id, value)}
+                value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}
+              />
+            </div>
           </div>
-          <div className="space-y-1">
-            <h3 className="text-sm">{dish.name}</h3>
-            <p className="text-xs">{dish.description}</p>
-            <p className="text-xs font-semibold">{formatCurrency(dish.price)}</p>
-          </div>
-          <div className="flex-shrink-0 ml-auto flex justify-center items-center">
-            <QuantityCounter
-              dishId={dish.id}
-              onChange={handleOrderChange}
-              value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}
-            />
-          </div>
-        </div>
-      ))}
+        ))}
       <div className="sticky bottom-0">
-        <Button className="w-full justify-between">
+        <Button onClick={handleOrder} className="w-full justify-between">
           <span>Giỏ hàng · {orders.length} món</span>
           <span>{formatCurrency(newTotalPrice)}</span>
         </Button>

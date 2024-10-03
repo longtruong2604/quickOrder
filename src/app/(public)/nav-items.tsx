@@ -1,6 +1,17 @@
 'use client'
 
 import { useAppContext } from '@/components/app-provider'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { useToast } from '@/components/ui/use-toast'
 import { Role } from '@/constants/type'
 import { handleErrorApi } from '@/lib/utils'
@@ -47,8 +58,9 @@ export default function NavItems({ className }: { className?: string }) {
       handleErrorApi({ error })
     }
   }
+
   return (
-    <>
+    <AlertDialog>
       <>
         {menuItems.map((item) => {
           const isAuth = role && item.role && item.role.includes(role)
@@ -61,7 +73,21 @@ export default function NavItems({ className }: { className?: string }) {
             )
         })}
       </>
-      {role && <button onClick={handleLogout}>Đăng xuất</button>}
-    </>
+      {role && (
+        <AlertDialogTrigger asChild>
+          <button>Đăng xuất</button>
+        </AlertDialogTrigger>
+      )}
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Bạn có chắc là mình muốn đăng xuất?</AlertDialogTitle>
+          <AlertDialogDescription>Đơn hàng sẽ bị xóa vĩnh viễn</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleLogout}>Xác nhận</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
