@@ -1,12 +1,11 @@
-import MenuOrder from './menu-order'
+import OrderCart from './order-cart'
 
-// fake data
-
-export default function MenuPage() {
+const Order = () => {
   return (
     <div className="max-w-[400px] mx-auto space-y-4">
       <h1 className="text-center text-xl font-bold">🍕 Menu quán</h1>
-      <MenuOrder />
+      <OrderCart />
     </div>
   )
 }
+export default Order

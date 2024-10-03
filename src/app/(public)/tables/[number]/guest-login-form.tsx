@@ -7,12 +7,15 @@ import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
-import { useGuestLoginMutation } from '@/queries/use-guest-auth'
+import { useGuestLoginMutation } from '@/queries/use-guest'
 import { useSearchParams } from 'next/navigation'
+import { useToast } from '@/components/ui/use-toast'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function GuestLoginForm({ tableNumber }: { tableNumber: string }) {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
+  const { toast } = useToast()
   const loginMutation = useGuestLoginMutation()
   const form = useForm<GuestLoginBodyType>({
     resolver: zodResolver(GuestLoginBody),
@@ -28,8 +31,9 @@ export default function GuestLoginForm({ tableNumber }: { tableNumber: string })
       try {
         const res = await loginMutation.mutateAsync(data)
         console.log(res)
+        toast({ title: res.payload.message })
       } catch (error) {
-        console.error(error)
+        handleErrorApi({ error })
       }
     },
     (error) => console.error(error)

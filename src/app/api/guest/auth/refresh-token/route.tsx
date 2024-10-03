@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
-import guestAuthApiRequest from '@/apiRequest/guest-auth'
+import guestApiRequest from '@/apiRequest/guest'
 
 export async function POST() {
   const cookieStore = cookies()
@@ -16,7 +16,7 @@ export async function POST() {
     )
   }
   try {
-    const { payload } = await guestAuthApiRequest.serverRefreshToken({
+    const { payload } = await guestApiRequest.serverRefreshToken({
       refreshToken,
     })
 

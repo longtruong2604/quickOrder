@@ -8,12 +8,12 @@ import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { getTableLink, getVietnameseTableStatus } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Switch } from '@/components/ui/switch'
 import Link from 'next/link'
 import { useGetTableQuery } from '@/queries/use-table'
 import { useEffect, useRef } from 'react'
+import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 
 export default function EditTable({
   id,
@@ -148,14 +148,14 @@ export default function EditTable({
                   <div className="col-span-3 w-full space-y-2">
                     <Link
                       href={getTableLink({
-                        token: '123123123',
+                        token: data?.token || '',
                         tableId: tableNumberRef.current,
                       })}
                       target="_blank"
                       className="break-all"
                     >
                       {getTableLink({
-                        token: '123123123',
+                        token: data?.token || '',
                         tableId: tableNumberRef.current,
                       })}
                     </Link>
