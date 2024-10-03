@@ -8,7 +8,7 @@ import authApiRequest from '@/apiRequest/auth'
 import { DishStatus, Role, TableStatus } from '@/constants/type'
 import envConfig from '../../config'
 import { TokenPayload } from '@/types/jwt.types'
-import guestAuthApiRequest from '@/apiRequest/guest-auth'
+import guestApiRequest from '@/apiRequest/guest'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -79,7 +79,7 @@ export const checkAndRefreshToken = async (param?: { onError?: (error?: any) => 
     // Gọi API refresh token
     const role = decodedRefreshToken.role
     try {
-      const res = role === Role.Guest ? await guestAuthApiRequest.refreshToken() : await authApiRequest.refreshToken() //logout automatically because of http error 401
+      const res = role === Role.Guest ? await guestApiRequest.refreshToken() : await authApiRequest.refreshToken() //logout automatically because of http error 401
       setAccessTokenToLocalStorage(res.payload.data.accessToken)
       setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
       param?.onSuccess && param.onSuccess()
