@@ -8,8 +8,9 @@ import {
   UpdateOrderBodyType,
   UpdateOrderResType,
 } from '@/schemaValidations/order.schema'
+import queryString from 'query-string'
 
-const prefix = '/order'
+const prefix = '/orders'
 export const orderApiRequest = {
   createOrder: (body: CreateOrdersBodyType) => http.post<CreateOrdersResType>(`${prefix}/`, body),
 
@@ -17,6 +18,6 @@ export const orderApiRequest = {
 
   updateOrder: (id: number, body: UpdateOrderBodyType) => http.put<UpdateOrderResType>(`${prefix}/${id}`, body),
 
-  getOrders: ({ fromDate, toDate }: GetOrdersQueryParamsType) =>
-    http.get<GetOrdersResType>(`${prefix}/?fromDate=${fromDate}&toDate=${toDate}`),
+  getOrders: (queryParams: GetOrdersQueryParamsType) =>
+    http.get<GetOrdersResType>(`${prefix}/?${queryString.stringify(queryParams)}`),
 }
