@@ -9,8 +9,10 @@ import QuantityCounter from './quantity-counter'
 import { useCreateGuestOrderMutation } from '@/queries/use-guest'
 import { useToast } from '@/components/ui/use-toast'
 import { DishStatus } from '@/constants/type'
+import { useRouter } from 'next/navigation'
 
 const MenuOrder = () => {
+  const router = useRouter()
   const [orders, setOrder] = useState<GuestCreateOrdersBodyType>([])
   const dishesQuery = useGetDishListQuery()
   const { toast } = useToast()
