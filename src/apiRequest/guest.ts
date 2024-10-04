@@ -16,9 +16,9 @@ const guestApiRequest = {
     status: number
     payload: RefreshTokenResType
   }> | null,
-  login: (body: GuestLoginBodyType) => http.post<GuestLoginResType>(`api/${prefix}/auth/login`, body, { baseUrl: '' }), // baseUrl: "localhost:3000"
+  login: (body: GuestLoginBodyType) => http.post<GuestLoginResType>(`api${prefix}/auth/login`, body, { baseUrl: '' }), // baseUrl: "localhost:3000"
   serverLogin: (body: GuestLoginBodyType) => http.post<GuestLoginResType>(`${prefix}/auth/login`, body), // baseUrl: "localhost:4000"
-  logout: () => http.post<MessageResType>(`api/${prefix}/auth/logout`, null, { baseUrl: '' }), // baseUrl: "localhost:3000"
+  logout: () => http.post<MessageResType>(`api${prefix}/auth/logout`, null, { baseUrl: '' }), // baseUrl: "localhost:3000"
   serverLogout: (body: LogoutBodyType & { accessToken: string }) =>
     http.post<MessageResType>(
       `${prefix}/auth/logout`,
