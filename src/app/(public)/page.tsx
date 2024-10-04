@@ -1,5 +1,5 @@
 import dishesApiRequest from '@/apiRequest/dish'
-import { revalidateRequest } from '@/apiRequest/revalidate-tag'
+import revalidateRequest from '@/apiRequest/revalidate-tag'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
 
@@ -7,9 +7,8 @@ export default async function Home() {
   let dishes: DishListResType['data'] = []
   try {
     const res = await dishesApiRequest.list()
-    revalidateRequest.revalidateTag('dishes')
+    await revalidateRequest('dishes')
     dishes = [...res.payload.data]
-    console.log(res)
   } catch (error: any) {
     console.error('Error fetching dishes', error)
   }
@@ -37,7 +36,13 @@ export default async function Home() {
           {dishes.map(({ name, price, description, id, image }) => (
             <div className="flex gap-4 w" key={id}>
               <div className="flex-shrink-0">
-                <img src={image} className="object-cover w-[150px] h-[150px] rounded-md" />
+                <Image
+                  alt="Dish image"
+                  width={150}
+                  height={150}
+                  src={image}
+                  className="object-cover w-[150px] h-[150px] rounded-md"
+                />
               </div>
               <div className="space-y-1">
                 <h3 className="text-xl font-semibold">{name}</h3>

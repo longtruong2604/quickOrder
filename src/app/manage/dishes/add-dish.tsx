@@ -17,7 +17,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useCreateDishMutation } from '@/queries/use-dish'
 import mediaApiRequest from '@/apiRequest/media'
 import { useToast } from '@/components/ui/use-toast'
-import { revalidateRequest } from '@/apiRequest/revalidate-tag'
+import revalidateRequest from '@/apiRequest/revalidate-tag'
 
 export default function AddDish() {
   const createDishMutation = useCreateDishMutation()
@@ -61,7 +61,7 @@ export default function AddDish() {
           if (uploadRes.payload) body.image = uploadRes.payload.data
         }
         const res = await createDishMutation.mutateAsync(body)
-        revalidateRequest.revalidateTag('dishes')
+        await revalidateRequest('dishes')
 
         if (res) {
           setOpen(false)

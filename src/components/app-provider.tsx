@@ -29,8 +29,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [roleState, setRoleState] = useState<undefined | RoleType>(undefined)
   useEffect(() => {
     const accessToken = getAccessTokenFromLocalStorage()
-    if (!accessToken) router.push('/')
-    else {
+    if (accessToken) {
       const role = decodeToken(accessToken).role
       setRoleState(role)
     }

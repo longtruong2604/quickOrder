@@ -30,7 +30,6 @@ export default function GuestLoginForm({ tableNumber }: { tableNumber: string })
     async (data: GuestLoginBodyType) => {
       try {
         const res = await loginMutation.mutateAsync(data)
-        console.log(res)
         toast({ title: res.payload.message })
       } catch (error) {
         handleErrorApi({ error })
