@@ -1,5 +1,6 @@
 'use client'
 import mediaApiRequest from '@/apiRequest/media'
+import revalidateRequest from '@/apiRequest/revalidate-tag'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -80,6 +81,8 @@ export default function EditDish({
           if (res.payload) body.image = res.payload.data
         }
         const res = await editDishMutation.mutateAsync({ id: id!, ...body })
+        await revalidateRequest('dishes')
+
         if (res.payload) {
           setId(undefined)
           reset()

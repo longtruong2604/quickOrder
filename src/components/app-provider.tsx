@@ -3,7 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 import RefreshToken from './refresh-token'
-import { getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
+import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
+import { RoleType } from '@/types/jwt.types'
+import { useRouter } from 'next/navigation'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,32 +17,34 @@ const queryClient = new QueryClient({
   },
 })
 
-const AppContext = createContext({
-  isAuth: false,
-  setIsAuth: (_isAuth: boolean) => {},
+const AppContext = createContext<{ role: undefined | RoleType; setRole: (_role: undefined | RoleType) => void }>({
+  role: undefined,
+  setRole: (_role: undefined | RoleType) => {},
 })
 
 export const useAppContext = () => useContext(AppContext)
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuth, setIsAuthState] = useState(false)
+  const router = useRouter()
+  const [roleState, setRoleState] = useState<undefined | RoleType>(undefined)
   useEffect(() => {
     const accessToken = getAccessTokenFromLocalStorage()
     if (accessToken) {
-      setIsAuthState(true)
+      const role = decodeToken(accessToken).role
+      setRoleState(role)
     }
-  }, [])
+  }, [router])
 
-  const setIsAuth = useCallback((isAuth: boolean) => {
-    if (isAuth) {
-      setIsAuthState(true)
+  const setRole = useCallback((role: undefined | RoleType) => {
+    if (role) {
+      setRoleState(role)
     } else {
-      setIsAuthState(false)
+      setRoleState(undefined)
       removeTokensFromLocalStorage()
     }
   }, [])
   return (
-    <AppContext.Provider value={{ isAuth, setIsAuth }}>
+    <AppContext.Provider value={{ role: roleState, setRole }}>
       <QueryClientProvider client={queryClient}>
         {children}
         <RefreshToken />

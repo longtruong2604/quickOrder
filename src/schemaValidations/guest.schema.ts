@@ -1,4 +1,4 @@
-import { RoleValues } from '@/constants/type'
+import { Role } from '@/constants/type'
 import { OrderSchema } from '@/schemaValidations/order.schema'
 import z from 'zod'
 
@@ -19,8 +19,10 @@ export const GuestLoginRes = z.object({
     guest: z.object({
       id: z.number(),
       name: z.string(),
-      role: z.enum(RoleValues),
+      role: z.enum([Role.Guest]),
       tableNumber: z.number().nullable(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
     }),
   }),
   message: z.string(),

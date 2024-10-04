@@ -1,6 +1,7 @@
 'use client'
 import menuItems from '@/app/manage/menuItems'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
+import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
 import { Package2, Settings } from 'lucide-react'
 import Link from 'next/link'
@@ -8,6 +9,7 @@ import { usePathname } from 'next/navigation'
 
 export default function NavLinks() {
   const pathname = usePathname()
+  const { toast } = useToast()
 
   return (
     <TooltipProvider>
@@ -26,19 +28,34 @@ export default function NavLinks() {
             return (
               <Tooltip key={index}>
                 <TooltipTrigger asChild>
-                  <Link
-                    href={Item.href}
-                    className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8',
-                      {
-                        'bg-accent text-accent-foreground': isActive,
-                        'text-muted-foreground': !isActive,
-                      }
-                    )}
-                  >
-                    <Item.Icon className="h-5 w-5" />
-                    <span className="sr-only">{Item.title}</span>
-                  </Link>
+                  {Item.comingSoon ? (
+                    <div
+                      onClick={() => toast({ title: 'Coming soon', duration: 1500 })}
+                      className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8',
+                        {
+                          'bg-accent text-accent-foreground': isActive,
+                          'text-muted-foreground': !isActive,
+                        }
+                      )}
+                    >
+                      <Item.Icon className="h-5 w-5" />
+                    </div>
+                  ) : (
+                    <Link
+                      href={Item.href}
+                      className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8',
+                        {
+                          'bg-accent text-accent-foreground': isActive,
+                          'text-muted-foreground': !isActive,
+                        }
+                      )}
+                    >
+                      <Item.Icon className="h-5 w-5" />
+                      <span className="sr-only">{Item.title}</span>
+                    </Link>
+                  )}
                 </TooltipTrigger>
                 <TooltipContent side="right">{Item.title}</TooltipContent>
               </Tooltip>
