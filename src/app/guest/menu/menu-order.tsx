@@ -45,6 +45,7 @@ const MenuOrder = () => {
     if (createGuestOrdersMutation.isPending) return
     try {
       const guestOrderRes = await createGuestOrdersMutation.mutateAsync(orders)
+      router.push(`/guest/orders`)
       toast({ title: guestOrderRes.payload.message })
     } catch (error) {
       handleErrorApi({ error })
