@@ -47,7 +47,7 @@ const MenuOrder = () => {
     if (createGuestOrdersMutation.isPending) return
     try {
       const guestOrderRes = await createGuestOrdersMutation.mutateAsync(orders)
-      router.push(`/guest/orders`)
+      router.push(`/guest/order`)
       toast({ title: guestOrderRes.payload.message })
     } catch (error) {
       handleErrorApi({ error })
@@ -82,6 +82,7 @@ const MenuOrder = () => {
             </div>
             <div className="flex-shrink-0 ml-auto flex justify-center items-center">
               <QuantityCounter
+                disabled={dish.status === DishStatus.Unavailable}
                 onChange={(value) => handleOrderChange(dish.id, value)}
                 value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}
               />

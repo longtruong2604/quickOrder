@@ -116,8 +116,10 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
     accessorKey: 'status',
     header: 'Trạng thái',
     cell: function Cell({ row }) {
+      console.log('row', row)
       const { changeStatus } = useContext(OrderTableContext)
       const changeOrderStatus = async (status: (typeof OrderStatusValues)[number]) => {
+        console.log('changeOrderStatus', status)
         changeStatus({
           orderId: row.original.id,
           dishId: row.original.dishSnapshot.dishId!,
@@ -128,6 +130,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
       return (
         <Select
           onValueChange={(value: (typeof OrderStatusValues)[number]) => {
+            console.log('onValueChange', value)
             changeOrderStatus(value)
           }}
           defaultValue={OrderStatus.Pending}

@@ -40,29 +40,31 @@ export class EntityError extends HttpError {
     this.payload = payload
   }
 }
-class SessionToken {
-  private token = ''
-  private expiresAt = new Date().toISOString()
-  get value() {
-    return this.token
-  }
-  set value(token: string) {
-    // Nếu gọi method này ở server thì sẽ bị lỗi
-    if (typeof window === 'undefined') {
-      throw new Error('Cannot set token on server side')
-    }
-    this.token = token
-  }
 
-  get expiredDate() {
-    return this.expiresAt
-  }
-  set expiredDate(newExpiredDate: string) {
-    this.expiresAt = newExpiredDate
-  }
-}
+// Used for storing session token in client side, but later we use localStorage instead
+// class SessionToken {
+//   private token = ''
+//   private expiresAt = new Date().toISOString()
+//   get value() {
+//     return this.token
+//   }
+//   set value(token: string) {
+//     // Nếu gọi method này ở server thì sẽ bị lỗi
+//     if (typeof window === 'undefined') {
+//       throw new Error('Cannot set token on server side')
+//     }
+//     this.token = token
+//   }
 
-export const clientSessionToken = new SessionToken()
+//   get expiredDate() {
+//     return this.expiresAt
+//   }
+//   set expiredDate(newExpiredDate: string) {
+//     this.expiresAt = newExpiredDate
+//   }
+// }
+
+// export const clientSessionToken = new SessionToken()
 let clientLogoutRequest: null | Promise<any> = null
 const isClient = typeof window !== 'undefined'
 

@@ -44,8 +44,9 @@ const OrderCart = () => {
     return () => {
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
+      socket.off('update-order', updateOrderStatus)
     }
-  }, [refetch])
+  }, [refetch, toast])
   return (
     <>
       {data.map((dish) => (

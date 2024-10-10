@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { OrderStatusValues } from '@/constants/type'
 import { getVietnameseOrderStatus } from '@/lib/utils'
-import { GetOrdersResType } from '@/schemaValidations/order.schema'
+import { CreateOrdersResType, GetOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import {
   ColumnFiltersState,
   SortingState,
@@ -30,8 +30,10 @@ import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { endOfDay, format, startOfDay } from 'date-fns'
-import { useGetOrderListQuery } from '@/queries/use-order'
+import { useGetOrderListQuery, useUpdateOrderMutation } from '@/queries/use-order'
 import { useGetTableListQuery } from '@/queries/use-table'
+import socket from '@/lib/socket'
+import { useToast } from '@/components/ui/use-toast'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (_value: number | undefined) => {},
@@ -58,13 +60,14 @@ const initFromDate = startOfDay(new Date())
 const initToDate = endOfDay(new Date())
 
 export default function OrderTable() {
+  const { toast } = useToast()
   const searchParam = useSearchParams()
   const { data: tablesQueryData } = useGetTableListQuery()
   const [openStatusFilter, setOpenStatusFilter] = useState(false)
   const [fromDate, setFromDate] = useState(initFromDate)
   const [toDate, setToDate] = useState(initToDate)
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
-  const { data: ordersQueryData } = useGetOrderListQuery({ fromDate, toDate })
+  const { data: ordersQueryData, refetch } = useGetOrderListQuery({ fromDate, toDate })
   const pageIndex = page - 1
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>()
   const orderList = ordersQueryData?.payload.data ?? []
@@ -74,10 +77,51 @@ export default function OrderTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const updateOrderMutation = useUpdateOrderMutation()
   const [pagination, setPagination] = useState({
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, //default page size
   })
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect()
+    }
+    function onConnect() {
+      console.log('connected', socket.id)
+    }
+
+    function refreshOrderList() {
+      if (Date.now() < toDate.getTime() && Date.now() > fromDate.getTime()) refetch()
+    }
+
+    function onDisconnect() {}
+
+    function createNewOrder({ data }: CreateOrdersResType) {
+      console.log(data)
+      toast({ title: '1 đơn hàng mới vừa được thêm' })
+      refreshOrderList()
+    }
+    function updateOrderStatus({ data }: UpdateOrderResType) {
+      console.log(data)
+      toast({ title: 'Đơn hàng đã được cập nhật' })
+      refreshOrderList()
+    }
+
+    socket.on('update-order', updateOrderStatus)
+
+    socket.on('new-order', createNewOrder)
+
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+
+    return () => {
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('new-order', createNewOrder)
+      socket.off('update-order', updateOrderStatus)
+    }
+  }, [fromDate, refetch, toDate, toast])
 
   const { statics, orderObjectByGuestId, servingGuestByTableNumber } = useOrderService(orderList)
 
@@ -86,7 +130,14 @@ export default function OrderTable() {
     dishId: number
     status: (typeof OrderStatusValues)[number]
     quantity: number
-  }) => {}
+  }) => {
+    try {
+      const res = await updateOrderMutation.mutateAsync({ ..._body, id: _body.orderId })
+      toast({ title: res.payload.message })
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const table = useReactTable({
     data: orderList,

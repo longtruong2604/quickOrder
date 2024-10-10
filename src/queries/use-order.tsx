@@ -22,13 +22,9 @@ export const useCreateOrderMutation = () => {
 }
 
 export const useUpdateOrderMutation = () => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['update-order'],
     mutationFn: ({ id, ...body }: { id: number } & UpdateOrderBodyType) => orderApiRequest.updateOrder(id, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['order-list'] })
-    },
   })
 }
 
@@ -36,5 +32,6 @@ export const useGetOrderDetailQuery = (id: number) => {
   return useQuery({
     queryKey: ['order-detail', id],
     queryFn: () => orderApiRequest.getOrderDetail(id),
+    enabled: !!id,
   })
 }

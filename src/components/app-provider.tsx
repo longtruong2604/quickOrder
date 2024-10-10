@@ -2,10 +2,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
-import RefreshToken from './refresh-token'
+// import RefreshToken from './refresh-token'
 import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
 import { RoleType } from '@/types/jwt.types'
 import { useRouter } from 'next/navigation'
+import RefreshToken from './refresh-token'
 
 const queryClient = new QueryClient({
   defaultOptions: {
