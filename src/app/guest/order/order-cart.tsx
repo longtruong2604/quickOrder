@@ -2,6 +2,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
+import { OrderStatus } from '@/constants/type'
 import socket from '@/lib/socket'
 import { formatCurrency } from '@/lib/utils'
 import { useGetGuestOrderListQuery } from '@/queries/use-guest'
@@ -13,11 +14,26 @@ const OrderCart = () => {
   const { toast } = useToast()
   const { data: orderListData, refetch } = useGetGuestOrderListQuery()
   const data = useMemo(() => orderListData?.payload.data ?? [], [orderListData])
-  const newTotalPrice = useMemo(
+  const { pendingAmount, paidAmount } = useMemo(
     () =>
-      data.reduce((acc, dish) => {
-        return acc + dish.dishSnapshot.price * dish.quantity
-      }, 0),
+      data.reduce(
+        (acc, dish) => {
+          if (dish.status === OrderStatus.Pending || dish.status === OrderStatus.Processing)
+            return {
+              ...acc,
+              pendingAmount: acc.pendingAmount + dish.dishSnapshot.price * dish.quantity,
+            }
+          else if (dish.status === OrderStatus.Paid || dish.status === OrderStatus.Delivered) {
+            return {
+              ...acc,
+              paidAmount: acc.paidAmount + dish.dishSnapshot.price * dish.quantity,
+            }
+          } else {
+            return acc
+          }
+        },
+        { pendingAmount: 0, paidAmount: 0 }
+      ),
     [data]
   )
   useEffect(() => {
@@ -75,8 +91,9 @@ const OrderCart = () => {
         </div>
       ))}
       <div className="sticky bottom-0">
-        <Button className="pointer-events-none w-full justify-end">
-          <span>{formatCurrency(newTotalPrice)}</span>
+        <Button className="flex flex-col pointer-events-none w-full justify-center items-end py-7 gap-1">
+          <div>Đã thanh toán {formatCurrency(paidAmount)}</div>
+          <div>Chưa thanh toán {formatCurrency(pendingAmount)}</div>
         </Button>
       </div>
     </>
