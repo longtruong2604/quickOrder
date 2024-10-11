@@ -7,7 +7,7 @@ import { useAppContext } from './app-provider'
 const UNAUTH_PATHS = ['/login', '/refresh-token', '/logout']
 
 const RefreshToken = () => {
-  const { socket } = useAppContext()
+  const { socket, disconnectSocket } = useAppContext()
   const pathName = usePathname()
   const router = useRouter()
   // prevent double api request
@@ -20,6 +20,7 @@ const RefreshToken = () => {
         onError(error) {
           console.error(error)
           clearInterval(interval)
+          disconnectSocket()
           router.push('/login')
         },
         forced,

@@ -91,7 +91,6 @@ export default function AddOrder() {
         handleErrorApi({ error, setError: form.setError })
       }
     } else {
-      console.log('hehe')
       if (!guest) {
         toast({ title: 'Chưa chọn khách hàng', variant: 'destructive' })
         return

@@ -41,7 +41,6 @@ export default function EditOrder({
   })
   useEffect(() => {
     if (data) {
-      console.log(data.dishSnapshot.id)
       form.reset({
         dishId: data.dishSnapshot.dishId!,
         quantity: data.quantity,

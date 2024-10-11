@@ -36,9 +36,6 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       handleErrorApi({ error })
     }
   }
-  console.log(
-    `https://qr.sepay.vn/img?acc=${envConfig.NEXT_PUBLIC_TRANSFER_ACCOUNT}&bank=${envConfig.NEXT_PUBLIC_TRANSFER_BANK}&amount=10000&des=${orderIds}`
-  )
   return (
     <div className="space-y-2 text-sm">
       {guest && (

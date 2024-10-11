@@ -37,10 +37,7 @@ export function middleware(request: NextRequest) {
     // Wrong path with wrong permission
     const role = decodeToken(refreshToken).role
     const isNotOwnerGoToOwnerPath = role !== Role.Owner && onlyOwnerPath.some((path) => pathname.startsWith(path))
-    console.log(
-      role,
-      onlyOwnerPath.some((path) => pathname.startsWith(path))
-    )
+
     if (
       (role !== Role.Guest && guestPath.some((path) => pathname.startsWith(path))) ||
       (role === Role.Guest && !guestPath.some((path) => pathname.startsWith(path))) ||

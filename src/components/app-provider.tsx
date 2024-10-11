@@ -1,13 +1,14 @@
 'use client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
 // import RefreshToken from './refresh-token'
 import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
 import { RoleType } from '@/types/jwt.types'
 import { useRouter } from 'next/navigation'
 import RefreshToken from './refresh-token'
 import { io, type Socket } from 'socket.io-client'
+import Logout from './logout'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,14 +39,17 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
   const [roleState, setRoleState] = useState<undefined | RoleType>(undefined)
   const [socket, setSocketState] = useState<Socket | undefined>(undefined)
-
+  const count = useRef(0)
   const setSocket = useCallback((accessToken: string) => {
-    console.log('setSocket')
     const URL = process.env.NEXT_PUBLIC_API_ENDPOINT
-    const socket = io(URL, {
-      auth: { Authorization: `Bearer ${accessToken}` },
-    })
-    setSocketState(socket)
+    if (count.current === 0) {
+      setSocketState(
+        io(URL, {
+          auth: { Authorization: `Bearer ${accessToken}` },
+        })
+      )
+      count.current = 1
+    }
   }, [])
 
   const disconnectSocket = () => {
@@ -59,7 +63,6 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     if (accessToken) {
       const role = decodeToken(accessToken).role
       setRoleState(role)
-      console.log('setSocketttt')
       setSocket(accessToken)
     }
   }, [router, setSocket])
@@ -76,6 +79,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     <AppContext.Provider value={{ role: roleState, setRole, socket, setSocket, disconnectSocket }}>
       <QueryClientProvider client={queryClient}>
         {children}
+        <Logout />
         <RefreshToken />
         <ReactQueryDevtools initialIsOpen={false} />;
       </QueryClientProvider>

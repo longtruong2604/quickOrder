@@ -16,7 +16,7 @@ import { Role } from '@/constants/type'
 
 export default function GuestLoginForm({ tableNumber }: { tableNumber: string }) {
   const searchParams = useSearchParams()
-  const { setRole } = useAppContext()
+  const { setRole, setSocket } = useAppContext()
   const token = searchParams.get('token')
   const { toast } = useToast()
   const router = useRouter()
@@ -34,8 +34,9 @@ export default function GuestLoginForm({ tableNumber }: { tableNumber: string })
     async (data: GuestLoginBodyType) => {
       try {
         const res = await loginMutation.mutateAsync(data)
-        router.push('/guest/menu')
+        setSocket(res.payload.data.accessToken)
         setRole(Role.Guest)
+        router.push('/guest/menu')
         toast({ title: res.payload.message })
       } catch (error) {
         handleErrorApi({ error })

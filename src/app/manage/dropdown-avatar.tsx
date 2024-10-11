@@ -19,7 +19,7 @@ import { useAppContext } from '@/components/app-provider'
 
 export default function DropdownAvatar() {
   const router = useRouter()
-  const { setRole } = useAppContext()
+  const { setRole, disconnectSocket } = useAppContext()
   const { toast } = useToast()
 
   const { data } = useAccountMeQuery()
@@ -32,6 +32,7 @@ export default function DropdownAvatar() {
       const result = await logoutMutation.mutateAsync()
       toast({ title: result.payload.message })
       setRole(undefined)
+      disconnectSocket()
       router.push('/')
     } catch (error) {
       handleErrorApi({ error })

@@ -33,7 +33,6 @@ export default function EditDish({
   setId: (value: number | undefined) => void
   onSubmitSuccess?: () => void
 }) {
-  console.log(Boolean(id))
   const editDishMutation = useUpdateDishMutation()
   const getDishQuery = useGetDishQuery({ enabled: Boolean(id), id: id as number })
   const data = getDishQuery.data?.payload.data
