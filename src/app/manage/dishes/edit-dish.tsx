@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { DishStatus, DishStatusValues } from '@/constants/type'
-import { getVietnameseDishStatus } from '@/lib/utils'
+import { getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
 import { useGetDishQuery, useUpdateDishMutation } from '@/queries/use-dish'
 import { UpdateDishBody, UpdateDishBodyType } from '@/schemaValidations/dish.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -88,10 +88,10 @@ export default function EditDish({
           reset()
         }
       } catch (error) {
-        console.log(error)
+        handleErrorApi({ error, setError: form.setError })
       }
     },
-    (error) => console.log(error)
+    (error) => console.error(error)
   )
 
   return (

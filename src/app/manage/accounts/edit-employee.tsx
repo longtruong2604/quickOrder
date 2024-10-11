@@ -99,7 +99,7 @@ export default function EditEmployee({
         })
       }
     },
-    (error) => console.log(error)
+    (error) => console.error(error)
   )
 
   const reset = () => {

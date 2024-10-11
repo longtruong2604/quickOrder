@@ -78,7 +78,7 @@ export default function AddEmployee() {
         })
       }
     },
-    (error) => console.log(error)
+    (error) => console.error(error)
   )
 
   return (
