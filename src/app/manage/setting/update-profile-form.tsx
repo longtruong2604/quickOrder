@@ -63,7 +63,6 @@ export default function UpdateProfileForm() {
   useEffect(() => {
     if (data) {
       const { name, avatar } = data.payload.data
-      console.log(avatar)
       form.setValue('name', name)
       if (avatar) form.setValue('avatar', avatar)
     }

@@ -64,7 +64,11 @@ export const removeTokensFromLocalStorage = () => {
   }
 }
 
-export const checkAndRefreshToken = async (param?: { onError?: (error?: any) => void; onSuccess?: () => void }) => {
+export const checkAndRefreshToken = async (param?: {
+  onError?: (error?: any) => void
+  onSuccess?: () => void
+  forced?: boolean
+}) => {
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if (!accessToken || !refreshToken) return
@@ -77,7 +81,7 @@ export const checkAndRefreshToken = async (param?: { onError?: (error?: any) => 
     param?.onError && param.onError()
     return
   }
-  if (decodedAccessToken.exp - now < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
+  if (param?.forced || decodedAccessToken.exp - now < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
     // Gọi API refresh token
     const role = decodedRefreshToken.role
     try {
