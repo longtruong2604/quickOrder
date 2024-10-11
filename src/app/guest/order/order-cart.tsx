@@ -6,7 +6,7 @@ import { OrderStatus } from '@/constants/type'
 import socket from '@/lib/socket'
 import { formatCurrency } from '@/lib/utils'
 import { useGetGuestOrderListQuery } from '@/queries/use-guest'
-import { UpdateOrderResType } from '@/schemaValidations/order.schema'
+import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
 import { useEffect, useMemo } from 'react'
 
@@ -18,12 +18,16 @@ const OrderCart = () => {
     () =>
       data.reduce(
         (acc, dish) => {
-          if (dish.status === OrderStatus.Pending || dish.status === OrderStatus.Processing)
+          if (
+            dish.status === OrderStatus.Pending ||
+            dish.status === OrderStatus.Processing ||
+            dish.status === OrderStatus.Delivered
+          )
             return {
               ...acc,
               pendingAmount: acc.pendingAmount + dish.dishSnapshot.price * dish.quantity,
             }
-          else if (dish.status === OrderStatus.Paid || dish.status === OrderStatus.Delivered) {
+          else if (dish.status === OrderStatus.Paid) {
             return {
               ...acc,
               paidAmount: acc.paidAmount + dish.dishSnapshot.price * dish.quantity,
@@ -52,7 +56,14 @@ const OrderCart = () => {
       refetch()
     }
 
+    function onPaid(data: PayGuestOrdersResType['data']) {
+      toast({ title: `Thanh toán thành công ${data.length} đơn` })
+      refetch()
+    }
+
     socket.on('update-order', updateOrderStatus)
+
+    socket.on('payment', onPaid)
 
     socket.on('connect', onConnect)
     socket.on('disconnect', onDisconnect)
@@ -61,6 +72,7 @@ const OrderCart = () => {
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
       socket.off('update-order', updateOrderStatus)
+      socket.off('payment', onPaid)
     }
   }, [refetch, toast])
   return (

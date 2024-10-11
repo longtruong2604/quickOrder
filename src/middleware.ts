@@ -21,7 +21,6 @@ export function middleware(request: NextRequest) {
   }
 
   if (refreshToken) {
-    console.log('refreshToken', refreshToken)
     // Đăng nhập rồi thì sẽ không cho vào login nữa
     if (unAuthPaths.some((path) => pathname.startsWith(path))) {
       return NextResponse.redirect(new URL('/', request.url))
@@ -36,7 +35,6 @@ export function middleware(request: NextRequest) {
     }
     // Wrong path with wrong permission
     const role = decodeToken(refreshToken).role
-    console.log('role', role)
     if (
       (role !== Role.Guest && guestPath.some((path) => pathname.startsWith(path))) ||
       (role === Role.Guest && !guestPath.some((path) => pathname.startsWith(path)))

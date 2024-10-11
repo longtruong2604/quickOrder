@@ -83,7 +83,6 @@ const request = async <Response>(
     const accessToken = localStorage.getItem('accessToken')
     if (accessToken) baseHeaders['Authorization'] = `Bearer ${accessToken}`
   }
-
   // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.API_ENDPOINT:http://localhost:4000
   // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server:http://localhost:3000
   const baseUrl =

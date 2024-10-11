@@ -9,7 +9,12 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { OrderStatusValues } from '@/constants/type'
 import { getVietnameseOrderStatus } from '@/lib/utils'
-import { CreateOrdersResType, GetOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
+import {
+  CreateOrdersResType,
+  GetOrdersResType,
+  PayGuestOrdersResType,
+  UpdateOrderResType,
+} from '@/schemaValidations/order.schema'
 import {
   ColumnFiltersState,
   SortingState,
@@ -107,8 +112,14 @@ export default function OrderTable() {
       toast({ title: 'Đơn hàng đã được cập nhật' })
       refreshOrderList()
     }
+    function onOrderPaid(data: PayGuestOrdersResType['data']) {
+      toast({ title: `Thanh toán thành công ${data.length} đơn` })
+      refreshOrderList()
+    }
 
     socket.on('update-order', updateOrderStatus)
+
+    socket.on('payment', onOrderPaid)
 
     socket.on('new-order', createNewOrder)
 
@@ -120,6 +131,7 @@ export default function OrderTable() {
       socket.off('disconnect', onDisconnect)
       socket.off('new-order', createNewOrder)
       socket.off('update-order', updateOrderStatus)
+      socket.off('payment', onOrderPaid)
     }
   }, [fromDate, refetch, toDate, toast])
 
