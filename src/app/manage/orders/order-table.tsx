@@ -37,8 +37,8 @@ import { cn } from '@/lib/utils'
 import { endOfDay, format, startOfDay } from 'date-fns'
 import { useGetOrderListQuery, useUpdateOrderMutation } from '@/queries/use-order'
 import { useGetTableListQuery } from '@/queries/use-table'
-import socket from '@/lib/socket'
 import { useToast } from '@/components/ui/use-toast'
+import { useAppContext } from '@/components/app-provider'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (_value: number | undefined) => {},
@@ -66,6 +66,7 @@ const initToDate = endOfDay(new Date())
 
 export default function OrderTable() {
   const { toast } = useToast()
+  const { socket } = useAppContext()
   const searchParam = useSearchParams()
   const { data: tablesQueryData } = useGetTableListQuery()
   const [openStatusFilter, setOpenStatusFilter] = useState(false)
@@ -89,11 +90,11 @@ export default function OrderTable() {
   })
 
   useEffect(() => {
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect()
     }
     function onConnect() {
-      console.log('connected', socket.id)
+      console.log('connected', socket?.id)
     }
 
     function refreshOrderList() {
@@ -117,23 +118,23 @@ export default function OrderTable() {
       refreshOrderList()
     }
 
-    socket.on('update-order', updateOrderStatus)
+    socket?.on('update-order', updateOrderStatus)
 
-    socket.on('payment', onOrderPaid)
+    socket?.on('payment', onOrderPaid)
 
-    socket.on('new-order', createNewOrder)
+    socket?.on('new-order', createNewOrder)
 
-    socket.on('connect', onConnect)
-    socket.on('disconnect', onDisconnect)
+    socket?.on('connect', onConnect)
+    socket?.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
-      socket.off('new-order', createNewOrder)
-      socket.off('update-order', updateOrderStatus)
-      socket.off('payment', onOrderPaid)
+      socket?.off('connect', onConnect)
+      socket?.off('disconnect', onDisconnect)
+      socket?.off('new-order', createNewOrder)
+      socket?.off('update-order', updateOrderStatus)
+      socket?.off('payment', onOrderPaid)
     }
-  }, [fromDate, refetch, toDate, toast])
+  }, [fromDate, refetch, toDate, toast, socket])
 
   const { statics, orderObjectByGuestId, servingGuestByTableNumber } = useOrderService(orderList)
 

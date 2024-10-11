@@ -1,9 +1,9 @@
 'use client'
+import { useAppContext } from '@/components/app-provider'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { OrderStatus } from '@/constants/type'
-import socket from '@/lib/socket'
 import { formatCurrency } from '@/lib/utils'
 import { useGetGuestOrderListQuery } from '@/queries/use-guest'
 import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
@@ -12,6 +12,7 @@ import { useEffect, useMemo } from 'react'
 
 const OrderCart = () => {
   const { toast } = useToast()
+  const { socket } = useAppContext()
   const { data: orderListData, refetch } = useGetGuestOrderListQuery()
   const data = useMemo(() => orderListData?.payload.data ?? [], [orderListData])
   const { pendingAmount, paidAmount } = useMemo(
@@ -41,11 +42,11 @@ const OrderCart = () => {
     [data]
   )
   useEffect(() => {
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect()
     }
     function onConnect() {
-      console.log('connected', socket.id)
+      console.log('connected', socket?.id)
     }
 
     function onDisconnect() {}
@@ -61,20 +62,20 @@ const OrderCart = () => {
       refetch()
     }
 
-    socket.on('update-order', updateOrderStatus)
+    socket?.on('update-order', updateOrderStatus)
 
-    socket.on('payment', onPaid)
+    socket?.on('payment', onPaid)
 
-    socket.on('connect', onConnect)
-    socket.on('disconnect', onDisconnect)
+    socket?.on('connect', onConnect)
+    socket?.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
-      socket.off('update-order', updateOrderStatus)
-      socket.off('payment', onPaid)
+      socket?.off('connect', onConnect)
+      socket?.off('disconnect', onDisconnect)
+      socket?.off('update-order', updateOrderStatus)
+      socket?.off('payment', onPaid)
     }
-  }, [refetch, toast])
+  }, [refetch, toast, socket])
   return (
     <>
       {data.map((dish) => (

@@ -1,12 +1,13 @@
 'use client'
-import socket from '@/lib/socket'
 import { checkAndRefreshToken } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useAppContext } from './app-provider'
 
 const UNAUTH_PATHS = ['/login', '/refresh-token', '/logout']
 
 const RefreshToken = () => {
+  const { socket } = useAppContext()
   const pathName = usePathname()
   const router = useRouter()
   // prevent double api request
@@ -28,26 +29,26 @@ const RefreshToken = () => {
     interval = setInterval(onRefreshToken, TIMEOUT)
 
     const onConnect = () => {
-      console.log('connected', socket.id)
+      console.log('connected', socket?.id)
     }
 
     const onDisconnect = () => {
-      console.log('disconnected', socket.id)
+      console.log('disconnected', socket?.id)
     }
 
-    if (socket.connected) {
-      socket.on('connect', onConnect)
-      socket.on('refresh-token', () => onRefreshToken(true))
-      socket.on('disconnect', () => {
+    if (socket?.connected) {
+      socket?.on('connect', onConnect)
+      socket?.on('refresh-token', () => onRefreshToken(true))
+      socket?.on('disconnect', () => {
         console.log('disconnected')
       })
     }
     return () => {
       clearInterval(interval)
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
+      socket?.off('connect', onConnect)
+      socket?.off('disconnect', onDisconnect)
     }
-  }, [pathName, router])
+  }, [pathName, router, socket])
   return <div>Logout...</div>
 }
 export default RefreshToken

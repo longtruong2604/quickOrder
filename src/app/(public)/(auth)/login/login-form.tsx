@@ -16,7 +16,7 @@ import { useAppContext } from '@/components/app-provider'
 
 function LoginComponent() {
   const { toast } = useToast()
-  const { setRole } = useAppContext()
+  const { setRole, setSocket } = useAppContext()
   const searchParams = useSearchParams()
   const clearTokens = searchParams.get('clear_tokens')
   const loginMutation = useLoginMutation()
@@ -40,6 +40,7 @@ function LoginComponent() {
       const result = await loginMutation.mutateAsync(data)
       toast({ title: result.payload.message })
       setRole(result.payload.data.account.role)
+      setSocket(result.payload.data.accessToken)
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
     }

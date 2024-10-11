@@ -7,6 +7,7 @@ import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStora
 import { RoleType } from '@/types/jwt.types'
 import { useRouter } from 'next/navigation'
 import RefreshToken from './refresh-token'
+import { io, type Socket } from 'socket.io-client'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,9 +18,18 @@ const queryClient = new QueryClient({
   },
 })
 
-const AppContext = createContext<{ role: undefined | RoleType; setRole: (_role: undefined | RoleType) => void }>({
+const AppContext = createContext<{
+  role: undefined | RoleType
+  setRole: (_role: undefined | RoleType) => void
+  socket: Socket | undefined
+  setSocket: (accessToken: string) => void
+  disconnectSocket: () => void
+}>({
   role: undefined,
   setRole: (_role: undefined | RoleType) => {},
+  socket: undefined,
+  setSocket: (_accessToken: string) => {},
+  disconnectSocket: () => {},
 })
 
 export const useAppContext = () => useContext(AppContext)
@@ -27,13 +37,32 @@ export const useAppContext = () => useContext(AppContext)
 const AppProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
   const [roleState, setRoleState] = useState<undefined | RoleType>(undefined)
+  const [socket, setSocketState] = useState<Socket | undefined>(undefined)
+
+  const setSocket = useCallback((accessToken: string) => {
+    console.log('setSocket')
+    const URL = process.env.NEXT_PUBLIC_API_ENDPOINT
+    const socket = io(URL, {
+      auth: { Authorization: `Bearer ${accessToken}` },
+    })
+    setSocketState(socket)
+  }, [])
+
+  const disconnectSocket = () => {
+    if (socket) {
+      socket.disconnect()
+    }
+    setSocketState(undefined)
+  }
   useEffect(() => {
     const accessToken = getAccessTokenFromLocalStorage()
     if (accessToken) {
       const role = decodeToken(accessToken).role
       setRoleState(role)
+      console.log('setSocketttt')
+      setSocket(accessToken)
     }
-  }, [router])
+  }, [router, setSocket])
 
   const setRole = useCallback((role: undefined | RoleType) => {
     if (role) {
@@ -44,7 +73,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
   return (
-    <AppContext.Provider value={{ role: roleState, setRole }}>
+    <AppContext.Provider value={{ role: roleState, setRole, socket, setSocket, disconnectSocket }}>
       <QueryClientProvider client={queryClient}>
         {children}
         <RefreshToken />
