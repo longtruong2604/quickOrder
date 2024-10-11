@@ -1,31 +1,42 @@
 'use client'
+import QuantityCounter from '@/app/guest/menu/quantity-counter'
+import GuestsDialog from '@/app/manage/orders/guests-dialog'
+import { TablesDialog } from '@/app/manage/orders/tables-dialog'
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { PlusCircle } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { TablesDialog } from '@/app/manage/orders/tables-dialog'
-import { GetListGuestsResType } from '@/schemaValidations/account.schema'
 import { Switch } from '@/components/ui/switch'
-import GuestsDialog from '@/app/manage/orders/guests-dialog'
-import { CreateOrdersBodyType } from '@/schemaValidations/order.schema'
-import Image from 'next/image'
-import { cn, formatCurrency } from '@/lib/utils'
+import { useToast } from '@/components/ui/use-toast'
 import { DishStatus } from '@/constants/type'
+import { cn, formatCurrency, handleErrorApi } from '@/lib/utils'
+import { useCreateGuestMutation } from '@/queries/use-account'
+import { useGetDishListQuery } from '@/queries/use-dish'
+import { useCreateOrderMutation } from '@/queries/use-order'
+import { GetListGuestsResType } from '@/schemaValidations/account.schema'
 import { DishListResType } from '@/schemaValidations/dish.schema'
-import QuantityCounter from '@/app/guest/menu/quantity-counter'
+import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
+import { CreateOrdersBodyType } from '@/schemaValidations/order.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PlusCircle } from 'lucide-react'
+import Image from 'next/image'
+import { useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 export default function AddOrder() {
+  const { toast } = useToast()
   const [open, setOpen] = useState(false)
   const [selectedGuest, setSelectedGuest] = useState<GetListGuestsResType['data'][0] | null>(null)
   const [isNewGuest, setIsNewGuest] = useState(true)
+  const createGuestMutation = useCreateGuestMutation()
+  const createOrderMutation = useCreateOrderMutation()
   const [orders, setOrders] = useState<CreateOrdersBodyType['orders']>([])
-  const dishes: DishListResType['data'] = []
+  const getDishListQuery = useGetDishListQuery()
+  const dishes: DishListResType['data'] = useMemo(
+    () => getDishListQuery.data?.payload.data.filter((dish) => dish.status != DishStatus.Hidden) ?? [],
+    [getDishListQuery.data]
+  )
 
   const totalPrice = useMemo(() => {
     return dishes.reduce((result, dish) => {
@@ -42,8 +53,8 @@ export default function AddOrder() {
       tableNumber: 0,
     },
   })
-  const _name = form.watch('name')
-  const _tableNumber = form.watch('tableNumber')
+  const name = form.watch('name')
+  const tableNumber = form.watch('tableNumber')
 
   const handleQuantityChange = (dishId: number, quantity: number) => {
     setOrders((prevOrders) => {
@@ -60,7 +71,41 @@ export default function AddOrder() {
     })
   }
 
-  const handleOrder = async () => {}
+  const reset = () => {
+    form.reset()
+    setOrders([])
+    setSelectedGuest(null)
+  }
+
+  const handleOrder = async () => {
+    let guest: GetListGuestsResType['data'][0] | null = selectedGuest
+    if (isNewGuest) {
+      if (createGuestMutation.isPending) return
+      try {
+        const res = await createGuestMutation.mutateAsync({
+          name,
+          tableNumber,
+        })
+        guest = res.payload.data
+      } catch (error: any) {
+        handleErrorApi({ error, setError: form.setError })
+      }
+    } else {
+      console.log('hehe')
+      if (!guest) {
+        toast({ title: 'Chưa chọn khách hàng', variant: 'destructive' })
+        return
+      }
+    }
+    if (createOrderMutation.isPending) return
+    try {
+      await createOrderMutation.mutateAsync({ guestId: guest!.id, orders })
+      setOpen(false)
+      reset()
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
@@ -171,6 +216,7 @@ export default function AddOrder() {
               </div>
               <div className="flex-shrink-0 ml-auto flex justify-center items-center">
                 <QuantityCounter
+                  disabled={dish.status === DishStatus.Unavailable}
                   onChange={(value) => handleQuantityChange(dish.id, value)}
                   value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}
                 />
@@ -179,7 +225,7 @@ export default function AddOrder() {
           ))}
         <DialogFooter>
           <Button className="w-full justify-between" onClick={handleOrder} disabled={orders.length === 0}>
-            <span>Đặt hàng · {orders.length} món</span>
+            <span>Đặt hàng · {orders.reduce((acc, order) => acc + order.quantity, 0)} món</span>
             <span>{formatCurrency(totalPrice)}</span>
           </Button>
         </DialogFooter>

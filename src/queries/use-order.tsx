@@ -1,4 +1,3 @@
-import guestApiRequest from '@/apiRequest/guest'
 import { orderApiRequest } from '@/apiRequest/order'
 import { GetOrdersQueryParamsType, PayGuestOrdersBodyType, UpdateOrderBodyType } from '@/schemaValidations/order.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -14,7 +13,7 @@ export const useCreateOrderMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['create-order'],
-    mutationFn: guestApiRequest.createGuestOrder,
+    mutationFn: orderApiRequest.createOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order-list'] })
     },
