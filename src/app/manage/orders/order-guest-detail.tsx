@@ -24,10 +24,10 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
     : []
 
   const orderIds = ordersFilterToPurchase.map((order) => order.id)
-  // const paymentAmount = ordersFilterToPurchase.reduce(
-  //   (acc, order) => acc + order.quantity * order.dishSnapshot.price,
-  //   0
-  // )
+  const paymentAmount = ordersFilterToPurchase.reduce(
+    (acc, order) => acc + order.quantity * order.dishSnapshot.price,
+    0
+  )
   const paidOrderFilter = guest ? orders.filter((order) => order.status === OrderStatus.Paid) : []
   const pay = async () => {
     try {
@@ -109,13 +109,7 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       <div className="space-x-1">
         <span className="font-semibold">Chưa thanh toán:</span>
         <Badge>
-          <span>
-            {formatCurrency(
-              ordersFilterToPurchase.reduce((acc, order) => {
-                return acc + order.quantity * order.dishSnapshot.price
-              }, 0)
-            )}
-          </span>
+          <span>{formatCurrency(paymentAmount)}</span>
         </Badge>
       </div>
       <div className="space-x-1">
@@ -135,7 +129,7 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
         <Image
           width={200}
           height={200}
-          src={`https://qr.sepay.vn/img?acc=${envConfig.NEXT_PUBLIC_TRANSFER_ACCOUNT}&bank=${envConfig.NEXT_PUBLIC_TRANSFER_BANK}&amount=10000&des=${orderIds}}`}
+          src={`https://qr.sepay.vn/img?acc=${envConfig.NEXT_PUBLIC_TRANSFER_ACCOUNT}&bank=${envConfig.NEXT_PUBLIC_TRANSFER_BANK}&amount=${paymentAmount}&des=${orderIds}}`}
           alt=""
         ></Image>
         <Button

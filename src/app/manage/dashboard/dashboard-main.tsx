@@ -16,12 +16,13 @@ export default function DashboardMain() {
   const [toDate, setToDate] = useState<Date>(initToDate)
 
   const getDashboardIndicatorQuery = useGetDashboardIndicatorQuery({ fromDate, toDate })
-  const { revenue, guestCount, orderCount, servingTableCount, dishIndicator, revenueByDate } =
+  const { revenue, guestCount, orderCount, servingTableCount, dishIndicator, revenueByDate, successOrderCount } =
     getDashboardIndicatorQuery.data?.payload.data ?? {
       revenue: 0,
       guestCount: 0,
       orderCount: 0,
       servingTableCount: 0,
+      successOrderCount: 0,
       dishIndicator: [],
       revenueByDate: [],
     }
@@ -119,7 +120,7 @@ export default function DashboardMain() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{orderCount}</div>
-            <p className="text-xs text-muted-foreground">Đã thanh toán</p>
+            <p className="text-xs text-muted-foreground">Đã thanh toán: {successOrderCount}</p>
           </CardContent>
         </Card>
         <Card>

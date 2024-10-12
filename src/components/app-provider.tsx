@@ -1,7 +1,7 @@
 'use client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import { decodeToken, getAccessTokenFromLocalStorage } from '@/lib/utils'
 import { useAppStore } from '@/store/app.store'
 import { useRouter } from 'next/navigation'
@@ -19,16 +19,20 @@ const queryClient = new QueryClient({
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
-  const { setRole, setSocket } = useAppStore()
+  const count = useRef(0)
+  const { setRole, setSocket, socket } = useAppStore()
 
   useEffect(() => {
     const accessToken = getAccessTokenFromLocalStorage()
     if (accessToken) {
       const role = decodeToken(accessToken).role
       setRole(role)
-      setSocket(accessToken)
+      if (count.current === 0 && !socket) {
+        setSocket(accessToken)
+        count.current++
+      }
     }
-  }, [router, setSocket, setRole])
+  }, [router, setSocket, setRole, socket])
 
   return (
     <QueryClientProvider client={queryClient}>

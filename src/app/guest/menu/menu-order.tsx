@@ -31,15 +31,16 @@ const MenuOrder = () => {
     setOrder((prev) => {
       const newOrders = [...prev]
       const index = newOrders.findIndex((order) => order.dishId === dishId)
-      if (quantity === 0) {
-        newOrders.filter((item) => item.dishId !== dishId)
-      }
+
       if (index === -1) {
         newOrders.push({ dishId, quantity })
       } else {
         newOrders[index].quantity = quantity
       }
-      return newOrders
+      if (quantity === 0) {
+        console.log('remove')
+        return newOrders.filter((item) => item.dishId !== dishId)
+      } else return newOrders
     })
   }
 

@@ -14,6 +14,7 @@ export const DashboardIndicatorRes = z.object({
     guestCount: z.number(),
     orderCount: z.number(),
     servingTableCount: z.number(),
+    successOrderCount: z.number(),
     dishIndicator: z.array(
       DishSchema.extend({
         successOrders: z.number(),
