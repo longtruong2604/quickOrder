@@ -4,14 +4,15 @@ import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { DashboardIndicatorResType } from '@/schemaValidations/indicator.schema'
 
-// const colors = [
-//   'var(--color-chrome)',
-//   'var(--color-safari)',
-//   'var(--color-firefox)',
-//   'var(--color-edge)',
-//   'var(--color-other)',
-// ];
+const colors = [
+  'var(--color-chrome)',
+  'var(--color-safari)',
+  'var(--color-firefox)',
+  'var(--color-edge)',
+  'var(--color-other)',
+]
 
 const chartConfig = {
   visitors: {
@@ -38,14 +39,22 @@ const chartConfig = {
     color: 'hsl(var(--chart-5))',
   },
 } satisfies ChartConfig
-const chartData = [
-  { name: 'chrome', successOrders: 275, fill: 'var(--color-chrome)' },
-  { name: 'safari', successOrders: 200, fill: 'var(--color-safari)' },
-  { name: 'firefox', successOrders: 187, fill: 'var(--color-firefox)' },
-  { name: 'edge', successOrders: 173, fill: 'var(--color-edge)' },
-  { name: 'other', successOrders: 90, fill: 'var(--color-other)' },
-]
-export function DishBarChart() {
+// const chartData = [
+//   { name: 'chrome', successOrders: 275, fill: 'var(--color-chrome)' },
+//   { name: 'safari', successOrders: 200, fill: 'var(--color-safari)' },
+//   { name: 'firefox', successOrders: 187, fill: 'var(--color-firefox)' },
+//   { name: 'edge', successOrders: 173, fill: 'var(--color-edge)' },
+//   { name: 'other', successOrders: 90, fill: 'var(--color-other)' },
+// ]
+export function DishBarChart({
+  dishIndicator,
+}: {
+  dishIndicator: Pick<DashboardIndicatorResType['data']['dishIndicator'][number], 'successOrders' | 'name'>[]
+}) {
+  const chartData = dishIndicator.map((item) => ({
+    ...item,
+    fill: colors[dishIndicator.indexOf(item) % colors.length],
+  }))
   return (
     <Card>
       <CardHeader>

@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import { Menu, Package2 } from 'lucide-react'
+import NavItems from '@/app/(public)/nav-items'
+import { DarkModeToggle } from '@/components/dark-mode-toggle'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { DarkModeToggle } from '@/components/dark-mode-toggle'
-import NavItems from '@/app/(public)/nav-items'
+import { Menu, Package2 } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Layout({
   children,
@@ -16,7 +16,6 @@ export default function Layout({
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link href="#" className="flex items-center gap-2 text-lg font-semibold md:text-base">
             <Package2 className="h-6 w-6" />
-            <span className="sr-only">Big boy</span>
           </Link>
           <NavItems className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0" />
         </nav>
@@ -31,10 +30,8 @@ export default function Layout({
             <nav className="grid gap-6 text-lg font-medium">
               <Link href="#" className="flex items-center gap-2 text-lg font-semibold">
                 <Package2 className="h-6 w-6" />
-                <span className="sr-only">Big boy</span>
               </Link>
-
-              <NavItems className="text-muted-foreground transition-colors hover:text-foreground" />
+              <NavItems isSheet={true} className="text-muted-foreground transition-colors hover:text-foreground" />
             </nav>
           </SheetContent>
         </Sheet>

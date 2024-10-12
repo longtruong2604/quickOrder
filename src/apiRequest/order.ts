@@ -5,6 +5,8 @@ import {
   GetOrderDetailResType,
   GetOrdersQueryParamsType,
   GetOrdersResType,
+  PayGuestOrdersBodyType,
+  PayGuestOrdersResType,
   UpdateOrderBodyType,
   UpdateOrderResType,
 } from '@/schemaValidations/order.schema'
@@ -20,4 +22,13 @@ export const orderApiRequest = {
 
   getOrders: (queryParams: GetOrdersQueryParamsType) =>
     http.get<GetOrdersResType>(`${prefix}/?${queryString.stringify(queryParams)}`),
+
+  makePayment: (body: PayGuestOrdersBodyType) => http.post<PayGuestOrdersResType>(`${prefix}/pay`, body),
+
+  serverMakePayment: (body: PayGuestOrdersBodyType, accessToken: string) =>
+    http.post<PayGuestOrdersResType>(`${prefix}/pay`, body, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }),
 }

@@ -19,7 +19,7 @@ const RefreshTokenComponent = () => {
     }
   }, [refreshToken, redirectUrl, router])
 
-  return <div>Refreshing...</div>
+  return undefined
 }
 
 const RefreshTokenPage = () => {

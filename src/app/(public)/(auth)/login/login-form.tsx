@@ -10,21 +10,41 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '@/queries/use-auth'
 import { useToast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/store/app.store'
+import envConfig from '../../../../../config'
+import Link from 'next/link'
+
+const getOauthGoogleUrl = () => {
+  const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
+  const options = {
+    redirect_uri: envConfig.NEXT_PUBLIC_GOOGLE_AUTHORIZED_REDIRECT_URI,
+    client_id: envConfig.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    access_type: 'offline',
+    response_type: 'code',
+    prompt: 'consent',
+    scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'].join(
+      ' '
+    ),
+  }
+  const qs = new URLSearchParams(options)
+  return `${rootUrl}?${qs.toString()}`
+}
 
 function LoginComponent() {
+  const googleAuthUrl = getOauthGoogleUrl()
+  const router = useRouter()
   const { toast } = useToast()
-  const { setRole } = useAppContext()
+  const { setRole, setSocket } = useAppStore()
   const searchParams = useSearchParams()
   const clearTokens = searchParams.get('clear_tokens')
   const loginMutation = useLoginMutation()
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'admin@order.com',
+      password: '123456',
     },
   })
 
@@ -40,6 +60,8 @@ function LoginComponent() {
       const result = await loginMutation.mutateAsync(data)
       toast({ title: result.payload.message })
       setRole(result.payload.data.account.role)
+      setSocket(result.payload.data.accessToken)
+      router.push('/manage/dashboard')
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
     }
@@ -90,13 +112,13 @@ function LoginComponent() {
               <Button type="submit" className="w-full">
                 Đăng nhập
               </Button>
-              <Button
-                onClick={() => toast({ title: 'Coming soon' })}
-                variant="outline"
-                className="w-full"
-                type="button"
-              >
-                Đăng nhập bằng Google
+              <Button variant="outline" className="w-full" type="button">
+                <Link
+                  href={googleAuthUrl}
+                  // onClick={() => toast({ title: 'Coming soon' })}
+                >
+                  Đăng nhập bằng Google
+                </Link>
               </Button>
             </div>
           </form>
