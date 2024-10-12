@@ -4,9 +4,9 @@ import { useToast } from '@/components/ui/use-toast'
 import { useSetTokenMutation } from '@/queries/use-auth'
 import { useAppStore } from '@/store/app.store'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 
-const Page = () => {
+const OAuthComp = () => {
   const params = useSearchParams()
   const { setRole, setSocket } = useAppStore()
   const { mutateAsync } = useSetTokenMutation()
@@ -44,4 +44,10 @@ const Page = () => {
   console.log(message, status)
   return <div>Page</div>
 }
-export default Page
+
+const OAuthPage = () => (
+  <Suspense>
+    <OAuthComp />
+  </Suspense>
+)
+export default OAuthPage
