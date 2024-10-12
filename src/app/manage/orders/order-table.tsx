@@ -38,7 +38,7 @@ import { endOfDay, format, startOfDay } from 'date-fns'
 import { useGetOrderListQuery, useUpdateOrderMutation } from '@/queries/use-order'
 import { useGetTableListQuery } from '@/queries/use-table'
 import { useToast } from '@/components/ui/use-toast'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/store/app.store'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (_value: number | undefined) => {},
@@ -66,7 +66,7 @@ const initToDate = endOfDay(new Date())
 
 export default function OrderTable() {
   const { toast } = useToast()
-  const { socket } = useAppContext()
+  const { socket } = useAppStore()
   const searchParam = useSearchParams()
   const { data: tablesQueryData } = useGetTableListQuery()
   const [openStatusFilter, setOpenStatusFilter] = useState(false)

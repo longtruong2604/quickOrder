@@ -15,11 +15,11 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
 import { useAccountMeQuery } from '@/queries/use-account'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/store/app.store'
 
 export default function DropdownAvatar() {
   const router = useRouter()
-  const { setRole, disconnectSocket } = useAppContext()
+  const { setRole, disconnectSocket } = useAppStore()
   const { toast } = useToast()
 
   const { data } = useAccountMeQuery()

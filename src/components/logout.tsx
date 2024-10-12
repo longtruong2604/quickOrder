@@ -1,22 +1,22 @@
 'use client'
 import { handleErrorApi } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/use-auth'
+import { useAppStore } from '@/store/app.store'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { useAppContext } from './app-provider'
 
 const Logout = () => {
-  const { socket, disconnectSocket } = useAppContext()
-  const logoutMutation = useLogoutMutation()
+  const { socket, disconnectSocket } = useAppStore()
+  const { mutateAsync, isPending } = useLogoutMutation()
   const pathName = usePathname()
   const router = useRouter()
   // prevent double api request
   useEffect(() => {
     const onLogout = async () => {
       console.log('logout')
-      if (logoutMutation.isPending) return
+      if (isPending) return
       try {
-        await logoutMutation.mutateAsync()
+        await mutateAsync()
         disconnectSocket()
         router.push('/')
       } catch (error) {
@@ -38,7 +38,7 @@ const Logout = () => {
       socket?.off('logout', onLogout)
       socket?.off('disconnect', onDisconnect)
     }
-  }, [disconnectSocket, logoutMutation, pathName, router, socket])
-  return <div>Logout...</div>
+  }, [disconnectSocket, isPending, mutateAsync, pathName, router, socket])
+  return undefined
 }
 export default Logout

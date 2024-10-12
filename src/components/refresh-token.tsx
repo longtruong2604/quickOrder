@@ -2,12 +2,12 @@
 import { checkAndRefreshToken } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { useAppContext } from './app-provider'
+import { useAppStore } from '@/store/app.store'
 
 const UNAUTH_PATHS = ['/login', '/refresh-token', '/logout']
 
 const RefreshToken = () => {
-  const { socket, disconnectSocket } = useAppContext()
+  const { socket, disconnectSocket } = useAppStore()
   const pathName = usePathname()
   const router = useRouter()
   // prevent double api request
@@ -49,7 +49,7 @@ const RefreshToken = () => {
       socket?.off('connect', onConnect)
       socket?.off('disconnect', onDisconnect)
     }
-  }, [pathName, router, socket])
-  return <div>Logout...</div>
+  }, [pathName, router, socket, disconnectSocket])
+  return undefined
 }
 export default RefreshToken

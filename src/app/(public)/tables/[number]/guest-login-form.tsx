@@ -11,12 +11,12 @@ import { useGuestLoginMutation } from '@/queries/use-guest'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/store/app.store'
 import { Role } from '@/constants/type'
 
 export default function GuestLoginForm({ tableNumber }: { tableNumber: string }) {
   const searchParams = useSearchParams()
-  const { setRole, setSocket } = useAppContext()
+  const { setRole, setSocket } = useAppStore()
   const token = searchParams.get('token')
   const { toast } = useToast()
   const router = useRouter()
