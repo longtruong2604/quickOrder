@@ -4,20 +4,54 @@ import { RevenueLineChart } from '@/app/manage/dashboard/revenue-line-chart'
 import { DishBarChart } from '@/app/manage/dashboard/dish-bar-chart'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useGetDashboardIndicatorQuery } from '@/queries/use-indicator'
+import { useState } from 'react'
+import { endOfDay, format, startOfDay } from 'date-fns'
+import { formatCurrency } from '@/lib/utils'
 
 export default function DashboardMain() {
-  const resetDateFilter = () => {}
+  const initFromDate = startOfDay(new Date())
+  const initToDate = endOfDay(new Date())
+  const [fromDate, setFromDate] = useState<Date>(initFromDate)
+  const [toDate, setToDate] = useState<Date>(initToDate)
 
+  const getDashboardIndicatorQuery = useGetDashboardIndicatorQuery({ fromDate, toDate })
+  const { revenue, guestCount, orderCount, servingTableCount, dishIndicator, revenueByDate, successOrderCount } =
+    getDashboardIndicatorQuery.data?.payload.data ?? {
+      revenue: 0,
+      guestCount: 0,
+      orderCount: 0,
+      servingTableCount: 0,
+      successOrderCount: 0,
+      dishIndicator: [],
+      revenueByDate: [],
+    }
+
+  const resetDateFilter = () => {
+    setFromDate(initFromDate)
+    setToDate(initToDate)
+  }
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         <div className="flex items-center">
           <span className="mr-2">Từ</span>
-          <Input type="datetime-local" placeholder="Từ ngày" className="text-sm" />
+          <Input
+            type="datetime-local"
+            placeholder="Từ ngày"
+            className="text-sm"
+            value={format(fromDate, 'yyyy-MM-dd HH:mm').replace(' ', 'T')}
+            onChange={(event) => setFromDate(new Date(event.target.value))}
+          />
         </div>
         <div className="flex items-center">
           <span className="mr-2">Đến</span>
-          <Input type="datetime-local" placeholder="Đến ngày" />
+          <Input
+            type="datetime-local"
+            placeholder="Đến ngày"
+            value={format(toDate, 'yyyy-MM-dd HH:mm').replace(' ', 'T')}
+            onChange={(event) => setToDate(new Date(event.target.value))}
+          />
         </div>
         <Button className="" variant={'outline'} onClick={resetDateFilter}>
           Reset
@@ -41,7 +75,7 @@ export default function DashboardMain() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{formatCurrency(revenue)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -63,7 +97,7 @@ export default function DashboardMain() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{guestCount}</div>
             <p className="text-xs text-muted-foreground">Gọi món</p>
           </CardContent>
         </Card>
@@ -85,8 +119,8 @@ export default function DashboardMain() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">Đã thanh toán</p>
+            <div className="text-2xl font-bold">{orderCount}</div>
+            <p className="text-xs text-muted-foreground">Đã thanh toán: {successOrderCount}</p>
           </CardContent>
         </Card>
         <Card>
@@ -106,16 +140,16 @@ export default function DashboardMain() {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{servingTableCount}</div>
           </CardContent>
         </Card>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <div className="lg:col-span-4">
-          <RevenueLineChart />
+          <RevenueLineChart revenueByDate={revenueByDate} />
         </div>
         <div className="lg:col-span-3">
-          <DishBarChart />
+          <DishBarChart dishIndicator={dishIndicator} />
         </div>
       </div>
     </div>

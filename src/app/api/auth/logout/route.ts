@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import authApiRequest from '@/apiRequest/auth'
+import { HttpError } from '@/lib/http'
 
 export async function POST() {
   const cookieStore = cookies()
@@ -18,19 +19,27 @@ export async function POST() {
     )
   }
   try {
+    console.log(accessToken, refreshToken)
     const result = await authApiRequest.serverLogout({
       refreshToken,
       accessToken,
     })
     return Response.json(result.payload)
-  } catch (error) {
-    return Response.json(
-      {
-        message: 'Something went wrong',
-      },
-      {
-        status: 200,
-      }
-    )
+  } catch (error: any) {
+    if (error instanceof HttpError) {
+      return Response.json(error.payload, {
+        status: error.status,
+      })
+    } else {
+      return Response.json(
+        {
+          message: 'Something went wrong',
+          message2: error.message,
+        },
+        {
+          status: 200,
+        }
+      )
+    }
   }
 }

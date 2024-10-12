@@ -11,12 +11,12 @@ import { useGuestLoginMutation } from '@/queries/use-guest'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { handleErrorApi } from '@/lib/utils'
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/store/app.store'
 import { Role } from '@/constants/type'
 
 export default function GuestLoginForm({ tableNumber }: { tableNumber: string }) {
   const searchParams = useSearchParams()
-  const { setRole } = useAppContext()
+  const { setRole, setSocket } = useAppStore()
   const token = searchParams.get('token')
   const { toast } = useToast()
   const router = useRouter()
@@ -34,8 +34,9 @@ export default function GuestLoginForm({ tableNumber }: { tableNumber: string })
     async (data: GuestLoginBodyType) => {
       try {
         const res = await loginMutation.mutateAsync(data)
-        router.push('/guest/menu')
+        setSocket(res.payload.data.accessToken)
         setRole(Role.Guest)
+        router.push('/guest/menu')
         toast({ title: res.payload.message })
       } catch (error) {
         handleErrorApi({ error })

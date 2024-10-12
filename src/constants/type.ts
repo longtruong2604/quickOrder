@@ -31,18 +31,18 @@ export const TableStatusValues = [TableStatus.Available, TableStatus.Hidden, Tab
 
 export const OrderStatus = {
   Pending: 'Pending',
+  Paid: 'Paid',
   Processing: 'Processing',
   Rejected: 'Rejected',
   Delivered: 'Delivered',
-  Paid: 'Paid',
 } as const
 
 export const OrderStatusValues = [
   OrderStatus.Pending,
+  OrderStatus.Paid,
   OrderStatus.Processing,
   OrderStatus.Rejected,
   OrderStatus.Delivered,
-  OrderStatus.Paid,
 ] as const
 
 export const ManagerRoom = 'manager' as const

@@ -1,56 +1,46 @@
 'use client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
-import RefreshToken from './refresh-token'
-import { decodeToken, getAccessTokenFromLocalStorage, removeTokensFromLocalStorage } from '@/lib/utils'
-import { RoleType } from '@/types/jwt.types'
+import { ReactNode, useEffect, useRef } from 'react'
+import { decodeToken, getAccessTokenFromLocalStorage } from '@/lib/utils'
+import { useAppStore } from '@/store/app.store'
 import { useRouter } from 'next/navigation'
+import Logout from './logout'
+import RefreshToken from './refresh-token'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
       retry: false,
     },
   },
 })
 
-const AppContext = createContext<{ role: undefined | RoleType; setRole: (_role: undefined | RoleType) => void }>({
-  role: undefined,
-  setRole: (_role: undefined | RoleType) => {},
-})
-
-export const useAppContext = () => useContext(AppContext)
-
 const AppProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
-  const [roleState, setRoleState] = useState<undefined | RoleType>(undefined)
+  const count = useRef(0)
+  const { setRole, setSocket, socket } = useAppStore()
+
   useEffect(() => {
     const accessToken = getAccessTokenFromLocalStorage()
     if (accessToken) {
       const role = decodeToken(accessToken).role
-      setRoleState(role)
+      setRole(role)
+      if (count.current === 0 && !socket) {
+        setSocket(accessToken)
+        count.current++
+      }
     }
-  }, [router])
+  }, [router, setSocket, setRole, socket])
 
-  const setRole = useCallback((role: undefined | RoleType) => {
-    if (role) {
-      setRoleState(role)
-    } else {
-      setRoleState(undefined)
-      removeTokensFromLocalStorage()
-    }
-  }, [])
   return (
-    <AppContext.Provider value={{ role: roleState, setRole }}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <RefreshToken />
-        <ReactQueryDevtools initialIsOpen={false} />;
-      </QueryClientProvider>
-    </AppContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <Logout />
+      <RefreshToken />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   )
 }
 export default AppProvider

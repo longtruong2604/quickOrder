@@ -8,7 +8,7 @@ import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { getVietnameseTableStatus } from '@/lib/utils'
+import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import { CreateTableBody, CreateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -34,10 +34,10 @@ export default function AddTable() {
         form.reset()
         setOpen(false)
       } catch (error) {
-        console.log(error)
+        handleErrorApi({ error, setError: form.setError })
       }
     },
-    (error) => console.log(error)
+    (error) => console.error(error)
   )
 
   return (

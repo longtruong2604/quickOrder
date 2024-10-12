@@ -4,6 +4,7 @@ import { Role } from './constants/type'
 import { decodeToken } from './lib/utils'
 
 const guestPath = ['/guest']
+const onlyOwnerPath = ['/manage/accounts']
 const privatePaths = ['/manage', ...guestPath]
 const unAuthPaths = ['/login']
 
@@ -16,12 +17,11 @@ export function middleware(request: NextRequest) {
   // Chưa đăng nhập thì không cho vào private paths
   if (privatePaths.some((path) => pathname.startsWith(path)) && !refreshToken) {
     const url = new URL('/login', request.url)
-    url.searchParams.set('clearTokens', 'true')
+    url.searchParams.set('clear_tokens', 'true')
     return NextResponse.redirect(url)
   }
 
   if (refreshToken) {
-    console.log('refreshToken', refreshToken)
     // Đăng nhập rồi thì sẽ không cho vào login nữa
     if (unAuthPaths.some((path) => pathname.startsWith(path))) {
       return NextResponse.redirect(new URL('/', request.url))
@@ -36,10 +36,12 @@ export function middleware(request: NextRequest) {
     }
     // Wrong path with wrong permission
     const role = decodeToken(refreshToken).role
-    console.log('role', role)
+    const isNotOwnerGoToOwnerPath = role !== Role.Owner && onlyOwnerPath.some((path) => pathname.startsWith(path))
+
     if (
       (role !== Role.Guest && guestPath.some((path) => pathname.startsWith(path))) ||
-      (role === Role.Guest && !guestPath.some((path) => pathname.startsWith(path)))
+      (role === Role.Guest && !guestPath.some((path) => pathname.startsWith(path))) ||
+      isNotOwnerGoToOwnerPath
     ) {
       return NextResponse.redirect(new URL('/', request.url))
     }

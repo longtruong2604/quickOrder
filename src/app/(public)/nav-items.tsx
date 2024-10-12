@@ -1,6 +1,6 @@
 'use client'
 
-import { useAppContext } from '@/components/app-provider'
+import { useAppStore } from '@/store/app.store'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { SheetClose } from '@/components/ui/sheet'
 import { useToast } from '@/components/ui/use-toast'
 import { Role } from '@/constants/type'
 import { handleErrorApi } from '@/lib/utils'
@@ -42,8 +43,8 @@ const menuItems: { title: string; href: string; role?: RoleType[]; hideWhenLogge
   },
 ]
 
-export default function NavItems({ className }: { className?: string }) {
-  const { role, setRole } = useAppContext()
+export default function NavItems({ className, isSheet = false }: { className?: string; isSheet?: boolean }) {
+  const { role, setRole, disconnectSocket } = useAppStore()
   const router = useRouter()
   const logoutMutation = useGuestLogoutMutation()
   const { toast } = useToast()
@@ -53,6 +54,7 @@ export default function NavItems({ className }: { className?: string }) {
       const result = await logoutMutation.mutateAsync()
       toast({ title: result.payload.message })
       setRole(undefined)
+      disconnectSocket()
       router.push('/')
     } catch (error) {
       handleErrorApi({ error })
@@ -66,7 +68,13 @@ export default function NavItems({ className }: { className?: string }) {
           const isAuth = role && item.role && item.role.includes(role)
           const canShow = (!item.hideWhenLoggedIn && !item.role) || (!role && item.hideWhenLoggedIn)
           if (canShow || isAuth)
-            return (
+            return isSheet ? (
+              <SheetClose key={item.href} asChild>
+                <Link href={item.href} className={className}>
+                  {item.title}
+                </Link>
+              </SheetClose>
+            ) : (
               <Link href={item.href} key={item.href} className={className}>
                 {item.title}
               </Link>

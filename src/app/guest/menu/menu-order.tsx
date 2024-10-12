@@ -31,15 +31,16 @@ const MenuOrder = () => {
     setOrder((prev) => {
       const newOrders = [...prev]
       const index = newOrders.findIndex((order) => order.dishId === dishId)
-      if (quantity === 0) {
-        newOrders.filter((item) => item.dishId !== dishId)
-      }
+
       if (index === -1) {
         newOrders.push({ dishId, quantity })
       } else {
         newOrders[index].quantity = quantity
       }
-      return newOrders
+      if (quantity === 0) {
+        console.log('remove')
+        return newOrders.filter((item) => item.dishId !== dishId)
+      } else return newOrders
     })
   }
 
@@ -47,7 +48,7 @@ const MenuOrder = () => {
     if (createGuestOrdersMutation.isPending) return
     try {
       const guestOrderRes = await createGuestOrdersMutation.mutateAsync(orders)
-      router.push(`/guest/orders`)
+      router.push(`/guest/order`)
       toast({ title: guestOrderRes.payload.message })
     } catch (error) {
       handleErrorApi({ error })
@@ -82,6 +83,7 @@ const MenuOrder = () => {
             </div>
             <div className="flex-shrink-0 ml-auto flex justify-center items-center">
               <QuantityCounter
+                disabled={dish.status === DishStatus.Unavailable}
                 onChange={(value) => handleOrderChange(dish.id, value)}
                 value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}
               />

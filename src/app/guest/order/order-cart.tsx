@@ -1,31 +1,52 @@
 'use client'
+import { useAppStore } from '@/store/app.store'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import socket from '@/lib/socket'
+import { OrderStatus } from '@/constants/type'
 import { formatCurrency } from '@/lib/utils'
 import { useGetGuestOrderListQuery } from '@/queries/use-guest'
-import { UpdateOrderResType } from '@/schemaValidations/order.schema'
+import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
 import { useEffect, useMemo } from 'react'
 
 const OrderCart = () => {
   const { toast } = useToast()
+  const { socket } = useAppStore()
   const { data: orderListData, refetch } = useGetGuestOrderListQuery()
   const data = useMemo(() => orderListData?.payload.data ?? [], [orderListData])
-  const newTotalPrice = useMemo(
+  const { pendingAmount, paidAmount } = useMemo(
     () =>
-      data.reduce((acc, dish) => {
-        return acc + dish.dishSnapshot.price * dish.quantity
-      }, 0),
+      data.reduce(
+        (acc, dish) => {
+          if (
+            dish.status === OrderStatus.Pending ||
+            dish.status === OrderStatus.Processing ||
+            dish.status === OrderStatus.Delivered
+          )
+            return {
+              ...acc,
+              pendingAmount: acc.pendingAmount + dish.dishSnapshot.price * dish.quantity,
+            }
+          else if (dish.status === OrderStatus.Paid) {
+            return {
+              ...acc,
+              paidAmount: acc.paidAmount + dish.dishSnapshot.price * dish.quantity,
+            }
+          } else {
+            return acc
+          }
+        },
+        { pendingAmount: 0, paidAmount: 0 }
+      ),
     [data]
   )
   useEffect(() => {
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect()
     }
     function onConnect() {
-      console.log('connected', socket.id)
+      console.log('connected', socket?.id)
     }
 
     function onDisconnect() {}
@@ -36,16 +57,25 @@ const OrderCart = () => {
       refetch()
     }
 
-    socket.on('update-order', updateOrderStatus)
+    function onPaid(data: PayGuestOrdersResType['data']) {
+      toast({ title: `Thanh toán thành công ${data.length} đơn` })
+      refetch()
+    }
 
-    socket.on('connect', onConnect)
-    socket.on('disconnect', onDisconnect)
+    socket?.on('update-order', updateOrderStatus)
+
+    socket?.on('payment', onPaid)
+
+    socket?.on('connect', onConnect)
+    socket?.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
+      socket?.off('connect', onConnect)
+      socket?.off('disconnect', onDisconnect)
+      socket?.off('update-order', updateOrderStatus)
+      socket?.off('payment', onPaid)
     }
-  }, [refetch])
+  }, [refetch, toast, socket])
   return (
     <>
       {data.map((dish) => (
@@ -74,8 +104,9 @@ const OrderCart = () => {
         </div>
       ))}
       <div className="sticky bottom-0">
-        <Button className="pointer-events-none w-full justify-end">
-          <span>{formatCurrency(newTotalPrice)}</span>
+        <Button className="flex flex-col pointer-events-none w-full justify-center items-end py-7 gap-1">
+          <div>Đã thanh toán {formatCurrency(paidAmount)}</div>
+          <div>Chưa thanh toán {formatCurrency(pendingAmount)}</div>
         </Button>
       </div>
     </>

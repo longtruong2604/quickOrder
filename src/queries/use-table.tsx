@@ -1,5 +1,5 @@
 import tablesApiRequest from '@/apiRequest/tables'
-import { CreateTableBodyType, UpdateTableBodyType } from '@/schemaValidations/table.schema'
+import { UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useGetTableListQuery = () => {
@@ -21,7 +21,7 @@ export const useCreateTableMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['create-table'],
-    mutationFn: (body: CreateTableBodyType) => tablesApiRequest.createTable(body),
+    mutationFn: tablesApiRequest.createTable,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['table-list'] })
     },

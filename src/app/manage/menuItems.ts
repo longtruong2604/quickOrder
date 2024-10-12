@@ -1,11 +1,13 @@
-import { Home, LineChart, ShoppingCart, Users2, Salad, Table, LucideProps } from 'lucide-react'
+import { Role } from '@/constants/type'
+import { RoleType } from '@/types/jwt.types'
+import { Home, ShoppingCart, Users2, Salad, Table, LucideProps } from 'lucide-react'
 import { ForwardRefExoticComponent, RefAttributes } from 'react'
 
 const menuItems: {
   title: string
   Icon: ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>>
   href: string
-  comingSoon?: boolean
+  roles?: RoleType[]
 }[] = [
   {
     title: 'Dashboard',
@@ -29,15 +31,10 @@ const menuItems: {
   },
 
   {
-    title: 'Phân tích',
-    Icon: LineChart,
-    href: '/manage/analytics',
-    comingSoon: true,
-  },
-  {
     title: 'Nhân viên',
     Icon: Users2,
     href: '/manage/accounts',
+    roles: [Role.Owner],
   },
 ]
 

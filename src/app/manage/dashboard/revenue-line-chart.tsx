@@ -4,6 +4,7 @@ import { CartesianGrid, Line, LineChart, XAxis } from 'recharts'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { format, parse } from 'date-fns'
+import { DashboardIndicatorResType } from '@/schemaValidations/indicator.schema'
 const chartConfig = {
   desktop: {
     label: 'Desktop',
@@ -11,50 +12,54 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function RevenueLineChart() {
+export function RevenueLineChart({
+  revenueByDate,
+}: {
+  revenueByDate: DashboardIndicatorResType['data']['revenueByDate']
+}) {
   // fake 10 item
-  const chartData = [
-    {
-      date: '01/01/2024',
-      revenue: 1000,
-    },
-    {
-      date: '02/01/2024',
-      revenue: 2000,
-    },
-    {
-      date: '03/01/2024',
-      revenue: 1500,
-    },
-    {
-      date: '04/01/2024',
-      revenue: 3000,
-    },
-    {
-      date: '05/01/2024',
-      revenue: 2500,
-    },
-    {
-      date: '06/01/2024',
-      revenue: 4000,
-    },
-    {
-      date: '07/01/2024',
-      revenue: 3500,
-    },
-    {
-      date: '08/01/2024',
-      revenue: 5000,
-    },
-    {
-      date: '09/01/2024',
-      revenue: 4500,
-    },
-    {
-      date: '10/01/2024',
-      revenue: 6000,
-    },
-  ]
+  // const chartData = [
+  //   {
+  //     date: '01/01/2024',
+  //     revenue: 1000,
+  //   },
+  //   {
+  //     date: '02/01/2024',
+  //     revenue: 2000,
+  //   },
+  //   {
+  //     date: '03/01/2024',
+  //     revenue: 1500,
+  //   },
+  //   {
+  //     date: '04/01/2024',
+  //     revenue: 3000,
+  //   },
+  //   {
+  //     date: '05/01/2024',
+  //     revenue: 2500,
+  //   },
+  //   {
+  //     date: '06/01/2024',
+  //     revenue: 4000,
+  //   },
+  //   {
+  //     date: '07/01/2024',
+  //     revenue: 3500,
+  //   },
+  //   {
+  //     date: '08/01/2024',
+  //     revenue: 5000,
+  //   },
+  //   {
+  //     date: '09/01/2024',
+  //     revenue: 4500,
+  //   },
+  //   {
+  //     date: '10/01/2024',
+  //     revenue: 6000,
+  //   },
+  // ]
   return (
     <Card>
       <CardHeader>
@@ -65,7 +70,7 @@ export function RevenueLineChart() {
         <ChartContainer config={chartConfig}>
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={revenueByDate}
             margin={{
               left: 12,
               right: 12,
@@ -78,10 +83,10 @@ export function RevenueLineChart() {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => {
-                if (chartData.length < 8) {
+                if (revenueByDate.length < 8) {
                   return value
                 }
-                if (chartData.length < 33) {
+                if (revenueByDate.length < 33) {
                   const date = parse(value, 'dd/MM/yyyy', new Date())
                   return format(date, 'dd')
                 }

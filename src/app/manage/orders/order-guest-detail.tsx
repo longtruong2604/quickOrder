@@ -7,18 +7,35 @@ import {
   formatDateTimeToLocaleString,
   formatDateTimeToTimeString,
   getVietnameseOrderStatus,
+  handleErrorApi,
 } from '@/lib/utils'
+import { usePayOrderMutation } from '@/queries/use-order'
 import { GetOrdersResType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
 import { Fragment } from 'react'
+import envConfig from '../../../../config'
 
 type Guest = GetOrdersResType['data'][0]['guest']
 type Orders = GetOrdersResType['data']
 export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orders: Orders }) {
+  const makePayment = usePayOrderMutation()
   const ordersFilterToPurchase = guest
     ? orders.filter((order) => order.status !== OrderStatus.Paid && order.status !== OrderStatus.Rejected)
     : []
-  const purchasedOrderFilter = guest ? orders.filter((order) => order.status === OrderStatus.Paid) : []
+
+  const orderIds = ordersFilterToPurchase.map((order) => order.id)
+  const paymentAmount = ordersFilterToPurchase.reduce(
+    (acc, order) => acc + order.quantity * order.dishSnapshot.price,
+    0
+  )
+  const paidOrderFilter = guest ? orders.filter((order) => order.status === OrderStatus.Paid) : []
+  const pay = async () => {
+    try {
+      await makePayment.mutateAsync({ guestId: guest?.id as number })
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
   return (
     <div className="space-y-2 text-sm">
       {guest && (
@@ -92,13 +109,7 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       <div className="space-x-1">
         <span className="font-semibold">Chưa thanh toán:</span>
         <Badge>
-          <span>
-            {formatCurrency(
-              ordersFilterToPurchase.reduce((acc, order) => {
-                return acc + order.quantity * order.dishSnapshot.price
-              }, 0)
-            )}
-          </span>
+          <span>{formatCurrency(paymentAmount)}</span>
         </Badge>
       </div>
       <div className="space-x-1">
@@ -106,7 +117,7 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
         <Badge variant={'outline'}>
           <span>
             {formatCurrency(
-              purchasedOrderFilter.reduce((acc, order) => {
+              paidOrderFilter.reduce((acc, order) => {
                 return acc + order.quantity * order.dishSnapshot.price
               }, 0)
             )}
@@ -115,7 +126,19 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       </div>
 
       <div>
-        <Button className="w-full" size={'sm'} variant={'secondary'} disabled={ordersFilterToPurchase.length === 0}>
+        <Image
+          width={200}
+          height={200}
+          src={`https://qr.sepay.vn/img?acc=${envConfig.NEXT_PUBLIC_TRANSFER_ACCOUNT}&bank=${envConfig.NEXT_PUBLIC_TRANSFER_BANK}&amount=${paymentAmount}&des=${orderIds}}`}
+          alt=""
+        ></Image>
+        <Button
+          onClick={pay}
+          className="w-full"
+          size={'sm'}
+          variant={'secondary'}
+          disabled={ordersFilterToPurchase.length === 0}
+        >
           Thanh toán tất cả ({ordersFilterToPurchase.length} đơn)
         </Button>
       </div>
