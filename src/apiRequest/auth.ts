@@ -7,6 +7,7 @@ import {
   RefreshTokenResType,
 } from '@/schemaValidations/auth.schema'
 import { MessageResType } from '@/schemaValidations/common.schema'
+import { RoleType } from '@/types/jwt.types'
 
 const authApiRequest = {
   //To prevent duplicate API request
@@ -47,5 +48,16 @@ const authApiRequest = {
     this.refreshTokenRequest = null
     return result
   },
+
+  setToken: (body: { accessToken: string; refreshToken: string }) =>
+    http.post<{
+      data: {
+        accessToken: string
+        refreshToken: string
+        userId: number
+        role: RoleType
+      }
+      message: string
+    }>('api/auth/token', body, { baseUrl: '' }),
 }
 export default authApiRequest

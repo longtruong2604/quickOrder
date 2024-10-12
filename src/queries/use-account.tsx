@@ -1,7 +1,6 @@
 import accountApiRequest from '@/apiRequest/account'
 import {
   AccountResType,
-  CreateGuestBodyType,
   GetGuestListQueryParamsType,
   UpdateEmployeeAccountBodyType,
 } from '@/schemaValidations/account.schema'
@@ -101,6 +100,6 @@ export const useGetGuestListQuery = (queryParams: GetGuestListQueryParamsType) =
 export const useCreateGuestMutation = () => {
   return useMutation({
     mutationKey: ['create-guest'],
-    mutationFn: (body: CreateGuestBodyType) => accountApiRequest.createGuest(body),
+    mutationFn: accountApiRequest.createGuest,
   })
 }

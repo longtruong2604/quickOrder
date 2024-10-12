@@ -106,6 +106,7 @@ const request = async <Response>(
 
   // Interceptor là nơi chúng ta xử lý request và response trước khi trả về cho phía component
   if (!res.ok) {
+    console.log(res)
     if (res.status === ENTITY_ERROR_STATUS) {
       throw new EntityError(
         data as {
